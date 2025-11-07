@@ -26,8 +26,7 @@ Prepared by:
   - [2.3 Use Cases](#23-use-cases)
 - [3. User Interface](#3-user-interface)
 - [4. Product Backlog](#4-product-backlog)
-- [4. References](#4-references)
-- [Appendix: Grading Rubric](#appendix-grading-rubric)
+- [5. References](#4-references)
 
 <a name="revision-history"> </a>
 
@@ -36,7 +35,7 @@ Prepared by:
 | Name | Date | Changes | Version |
 | ------ | ------ | --------- | --------- |
 |Revision 1 |2024-11-07 |Initial draft | 1.0        |
-|Revision 2 |2025-11-06 |Part 1 Update |2.0         |
+|Revision 2 |2025-11-06 |Part 1 Update | 2.0        |
 |      |      |         |         |
 
 ----
@@ -101,7 +100,7 @@ This section will include the user stories you identified for your project. Make
 
 ----
 ## 2.3 Use Cases                         
-| Use case #                  |   |
+<!-- | Use case #                  |   |
 | ----------------------------|---|  
 | Name                        |  |
 | Participating actors        |  |
@@ -109,7 +108,7 @@ This section will include the user stories you identified for your project. Make
 | Exit condition(s)           |  |
 | Flow of events              | |
 | Alternative flow of events  | |
-| Iteration                   |	1 |
+| Iteration                   |	1 | -->
 
 | Use case # 1               |   |
 | ---------------------------|---|
@@ -117,8 +116,14 @@ This section will include the user stories you identified for your project. Make
 | Participating actor        | Student |
 | Entry condition(s)         | The student is logged in;  |
 | Exit condition(s)          | The student’s profile has been updated with the information they provided. |
-| Flow of events 	         | 1. The student selects the option to view their profile. 2. The system displays the details of the student’s profile and the option to edit their profile. 3. The student views their profile and selects the option to edit their profile. 4. The system prompts the user to provide the information needed to change the details of their profile. 5. The student enters their new profile information and confirms the information. 6. The system confirms that the profile information has been edited successfully and displays the updated profile information to the user.|
-| Alternative flow of events |1. The student may terminate the use case at any step before confirmation. (This will essentially act as the use case “View Profile”) 2. In step 6, the system may not confirm that the profile has been edited successfully. It will then communicate this to the user, and give them the option to try again. |
+| Flow of events 	         | 1. The student selects the option to view their profile. |
+|| 2. The system displays the details of the student’s profile and the option to edit their profile. |
+|| 3. The student views their profile and selects the option to edit their profile. |
+|| 4. The system prompts the user to provide the information needed to change the details of their profile. |
+|| 5. The student enters their new profile information and confirms the information. |
+|| 6. The system confirms that the profile information has been edited successfully and displays the updated profile information to the user.|
+| Alternative flow of events |1. The student may terminate the use case at any step before confirmation. (This will essentially act as the use case “View Profile”) |
+|| 2. In step 6, the system may not confirm that the profile has been edited successfully. It will then communicate this to the user, and give them the option to try again. |
 | Iteration #                | 2 |
 
                          
@@ -128,9 +133,14 @@ This section will include the user stories you identified for your project. Make
 | Participating actor         | Student |
 | Entry condition(s)          | The student is logged in; Positions are available to be applied to |
 | Exit condition(s)           | The selected position has been applied to by the student. |
-| Flow of events 	          | 1. The student selects a position to apply to from the available ones listed. 2. The system displays the details of the position and its application requirements, and then prompts the user to enter the required details for the application. 3. The student enters the statement required for the application, then submits it. 4. The system confirms that the necessary information has been completed, and then sends the application to the corresponding faculty member who posted the position. |
-| Alternative flow of events  | 1. If in Step 3 the application requires a recommendation from a faculty member, the student will have the option to select a registered faculty member from the system. 2. If the student hadn’t submitted the required information in step 3, then in step 4 the system will tell the user such and give them the opportunity to re-enter the information. 3. The student may terminate this use case at any step before confirmation. |
-| Iteration #                 | 2 |
+| Flow of events 	          | 1. The student selects a position to apply to from the available ones listed. |
+|| 2. The system displays the details of the position and its application requirements, and then prompts the user to enter the required details for the application. |
+|| 3. The student enters the statement required for the application, then submits it.|
+|| 4. The system confirms that the necessary information has been completed, and then sends the application to the corresponding faculty member who posted the position. |
+| Alternative flow of events  | 1. If in Step 3 the application requires a recommendation from a faculty member, the student will have the option to select a registered faculty member from the system.|
+|| 2. If the student hadn’t submitted the required information in step 3, then in step 4 the system will tell the user such and give them the opportunity to re-enter the information.|
+|| 3. The student may terminate this use case at any step before confirmation. |
+| Iteration #                 | 2 & 3|
 
                           
 | Use case # 3                |   |
@@ -139,8 +149,14 @@ This section will include the user stories you identified for your project. Make
 | Participating actors        | Faculty member |
 | Entry condition(s)          |	The user logged into the System and opened the Managing positions page |
 | Exit condition(s)           | The selected research position is added/updated to the users profile |
-| Flow of events              | 1. The user selects to add a new position 2. The system will prompt the user to enter all required details and qualifications for the position from predefined parameters 3. The user enters the necessary details and submits the new position4. The system saves the position as “open” and makes the position visible to students and shows message “Position is now posted” |
-| Alternative flow of events  | 1. In step 1 If the user selects to edit an existing position, the user updates any of the required details and qualifications and saves the changes. Alternatively, the user can delete an existing position. The system will save the position as “closed”, and it will no longer be visible for students. 2. In step 3, if the user selects to edit the predefined list; the system gives the user access to edit, then saves the changes. 3. In step 4 If the user tries to submit but does not fill out the necessary details, the system will allert them to the mistake and they will be able to try again  4. Alternatively, the user may choose to terminate this use case at any step before confirmation |
+| Flow of events              | 1. The user selects to add a new position. |
+|| 2. The system will prompt the user to enter all required details and qualifications for the position from predefined parameters |
+|| 3. The user enters the necessary details and submits the new position |
+|| 4. The system saves the position as “open” and makes the position visible to students and shows message “Position is now posted” |
+| Alternative flow of events  | 1. In step 1 If the user selects to edit an existing position, the user updates any of the required details and qualifications and saves the changes. Alternatively, the user can delete an existing position. The system will save the position as “closed”, and it will no longer be visible for students. |
+|| 2. In step 3, if the user selects to edit the predefined list; the system gives the user access to edit, then saves the changes. |
+|| 3. In step 4 If the user tries to submit but does not fill out the necessary details, the system will allert them to the mistake and they will be able to try again |
+|| 4. Alternatively, the user may choose to terminate this use case at any step before confirmation |
 | Iteration                   |	1 |
 
                          
@@ -150,8 +166,13 @@ This section will include the user stories you identified for your project. Make
 | Participating actors        | Faculty member |
 | Entry condition(s)          |	The user logged into the System and there are recommendations for the user to review |
 | Exit condition(s)           | The selected student's recommendation status is updated, and the student recommendation request is archived  |
-| Flow of events              | 1. The user selects a student's recommendation request 2. The system shows the details of the recommendation request 3. The system prompts the user to choose “recommend” or “not recommended” 4. The user chooses the status option and submits their choice 5. The system updates the student's recommended status and archives the request and shows message “recommendation request choice recorded” |
-| Alternative flow of events  | 1. In step 4 if the user wants to change the status, the system allows them to change their choice and saves the new choice 2. Alternatively, the user may choose to terminate this use case at any step before Step 4|
+| Flow of events              | 1. The user selects a student's recommendation request |
+|| 2. The system shows the details of the recommendation request |
+|| 3. The system prompts the user to choose “recommend” or “not recommended” |
+|| 4. The user chooses the status option and submits their choice |
+|| 5. The system updates the student's recommended status and archives the request and shows message “recommendation request choice recorded” |
+| Alternative flow of events  | 1. In step 4 if the user wants to change the status, the system allows them to change their choice and saves the new choice |
+|| 2. Alternatively, the user may choose to terminate this use case at any step before Step 4|
 | Iteration                   |	3 |
 
 
@@ -161,29 +182,46 @@ This section will include the user stories you identified for your project. Make
 | Participating actors        | Faculty Member(primary) Student(secondary) |
 | Entry condition(s)          |	Faculty logs in; open research position exists and students have applied to position |
 | Exit condition(s)           | Selected students’ applications are updated to either “accepted” or “rejected” respective to the positions available |
-| Flow of events              | 1.	The faculty selects a research position from their list of positions. 2. The system displays a list of all student applicants for the selected position. 3. The faculty selects a student applicant to review. 4. The system displays the student’s full profile, including GPA, coursework, and reference status. 5. The faculty reviews the applicant’s information and chooses to approve or reject the application. 6. The system prompts the faculty to confirm the decision. 7. Faculty confirms the approval or rejection. 8. The system updates the student’s application status accordingly and displays a confirmation message. 9. The system checks that the total number of approved students does not exceed the position’s maximum team size. 10. If within the limit, the system finalizes the approval; if the limit is exceeded, the system displays a warning message and prevents additional approvals. |
-| Alternative flow of events  | 1. In Step 9, if approving a student exceeds the maximum team size, the system prevents the approval and displays an error message: “Maximum team size reached. Cannot approve additional students.” 2. In Step 3, if there are no student applications for the selected position, the system displays: “No applications have been submitted for this position.” 3. In Step 4, if the system fails to load a student’s profile, the system displays: “Unable to retrieve student profile. Please try again later.” 4. At any step before confirmation, the faculty may cancel the process, and the system returns to the applicant list without saving any changes.|
+| Flow of events              | 1.	The faculty selects a research position from their list of positions.|
+|| 2. The system displays a list of all student applicants for the selected position. |
+|| 3. The faculty selects a student applicant to review. |
+|| 4. The system displays the student’s full profile, including GPA, coursework, and reference status. |
+|| 5. The faculty reviews the applicant’s information and chooses to approve or reject the application. |
+|| 6. The system prompts the faculty to confirm the decision. |
+|| 7. Faculty confirms the approval or rejection. |
+|| 8. The system updates the student’s application status accordingly and displays a confirmation message. |
+|| 9. The system checks that the total number of approved students does not exceed the position’s maximum team size. |
+|| 10. If within the limit, the system finalizes the approval; if the limit is exceeded, the system displays a warning message and prevents additional approvals. |
+| Alternative flow of events  | 1. In Step 9, if approving a student exceeds the maximum team size, the system prevents the approval and displays an error message: “Maximum team size reached. Cannot approve additional students.” |
+|| 2. In Step 3, if there are no student applications for the selected position, the system displays: “No applications have been submitted for this position.” |
+|| 3. In Step 4, if the system fails to load a student’s profile, the system displays: “Unable to retrieve student profile. Please try again later.” |
+|| 4. At any step before confirmation, the faculty may cancel the process, and the system returns to the applicant list without saving any changes.|
 | Iteration                   |	1 |
 
 | Use case # 6                |   |
 | ----------------------------|---|  
-| Name                        |  |
-| Participating actors        |  |
-| Entry condition(s)          |	 |
-| Exit condition(s)           |  |
-| Flow of events              | |
-| Alternative flow of events  | |
-| Iteration                   |	1 |
+| Name                        | Application Status & Withdrawal (Student) |
+| Participating actors        | Student |
+| Entry condition(s)          |	The Student is logged into the system and opens the "My Applications" page. |
+| Exit condition(s)           | The Student exits the web page via closing the tab or clicking onto another page on the site |
+| Flow of events              | 1. The Student opens their application dashboard. |
+|| 2. The system gets and displays all applications and references for that student as well as their respective status. |
+|| 3. The Student reviews the status information. |
+| Alternative flow of events  | 1. In step 2, the Student sees a pending application and selects to withdraw the application. The system prompts a confirmation message. The Student confirms. The system changes the application status to withdrawn, removes the Student from the application pool, and displays a confirmation message. |
+| Iteration                   |	2 & 3 |
 
 | Use case # 7                |   |
 | ----------------------------|---|  
-| Name                        |  |
-| Participating actors        |  |
-| Entry condition(s)          |	 |
-| Exit condition(s)           |  |
-| Flow of events              | |
-| Alternative flow of events  | |
-| Iteration                   |	1 |
+| Name                        | View Account (Faculty) |
+| Participating actors        | Faculty |
+| Entry condition(s)          |	The Faculty member is logged into the system and selects to view their profile/account information. |
+| Exit condition(s)           | The Faculty member exits the web page via closing the tab or clicking onto another page on the site |
+| Flow of events              | 1. The Faculty selects the profile icon to view their account |
+|| 2. The system displays the Faculty’s profile information, as well as a section for pending recommendation requests |
+|| 3. The Faculty member reviews the provided information. |
+| Alternative flow of events  | 1.  In step 2, the Faculty could decide to edit their profile details. The system would provide access to editable fields. The Faculty member would make any necessary changes and click “Save.” The system saves changes and confirms that those changes are saved with a displayed message. |
+|| 2. In step 3, the Faculty could select a recommendation request to look at. The system then displays options to approve or reject the requested recommendation. The Faculty then selects an options, and the system processes the decision and updates the status of the request.|
+| Iteration                   |	1 & 3 |
 
 ----
 # 3. User Interface
@@ -191,9 +229,17 @@ This section will include the user stories you identified for your project. Make
 Here you should include the sketches or mockups for the main parts of the interface.
 You may use Figma to design your interface:
 
-  Example image. The image file is in the `./images` directory.
+  Example images. The image files are in the `./images` directory.
   <kbd>
-      <img src="images/figma.jpg"  border="2">
+      <img src="images/signup.png"  border="2">
+      <img src="images/login.png"  border="2">
+      <img src="images/makepos.png"  border="2">
+      <img src="images/positions.png"  border="2">
+      <img src="images/fullresearchposition.png"  border="2">
+      <img src="images/applications.png"  border="2">
+      <img src="images/applicant.png"  border="2">
+      <img src="images/appstatus.png"  border="2">
+      <img src="images/vieworedit.png"  border="2"> 
   </kbd>
   
 ----
@@ -204,11 +250,7 @@ You may use Figma to design your interface:
 ----
 # 5. References
 
-Cite your references here.
-
-For the papers you cite give the authors, the title of the article, the journal name, journal volume number, date of publication and inclusive page numbers. Giving only the URL for the journal is not appropriate.
-
-For the websites, give the title, author (if applicable) and the website URL.
+No references used. 
 
 ----
 ----
