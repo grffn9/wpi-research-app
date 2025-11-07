@@ -66,37 +66,48 @@ This section will include the user stories you identified for your project. Make
 "As a **[Role]**, I want **[Feature]** so that **[Reason/Benefit]** "
 
 ### Student:
--	As a Student, I want to create an account and enter my profile information (including GPA, majors, and coursework) so that I can get research positions.
--	As a Student, I want to log in using my WPI email and password (or SSO) so that I can access my saved information securely.
-### Use Case: View Account (Tiffany)
+- As a Student, I want to create an account and enter my profile information (including GPA, majors, and coursework) so that I can get research positions.
+- As a Student, I want to log in using my WPI email and password so that I can access my saved information securely.	
+- As a Student, I want to log in using SSO so that I can access my saved information quickly and securely.
+
+### Use Case: View Account 
 -	As a Student, I want to view and edit all my profile details so that I can best reflect my current experiences and interests.
-### Use Case: Applying for a Position (Tifffany)
--	As a Student, I want to browse all available research positions so that I can find positions that best suit my interests.
--	As a Student, I want to select a position to view its full details (including team size, required GPA, and expected coursework) so that I can thoroughly evaluate if I’m qualified and interested before applying.
--	As a Student, I want the system to automatically display a list of recommended research positions, ranked by relevance so that I can efficiently find the best opportunities for me.
--	As a Student, I want to apply to multiple research positions so that I can have the best chances of getting a role.
--	As a Student, I want to submit a short statement of interest with my application so that professors are aware of my intent.
--	As a Student, I want to provide a faculty reference for a position that requires one.
--	Use Case: Status & Withdrawal (Griffin)
--	As a Student, I want to view the status of all research applications I have submitted (Pending, Approved, Rejected) so that I know how my current applications are being viewed.
--	As a Student, I want to view the status of my reference requests (Awaiting approval, Recommended, Not Recommended) so that I can further understand the state of my applications.
--	As a Student, I want to withdraw an application that is still in the "Pending" state so that I can no longer be in the pool of applicants for a position I don’t want.
+
+### Use Case: Applying for a Position 
+- As a Student, I want to browse all available research positions so that I can find positions that best suit my interests.
+- As a Student, I want to select a position to view its full details (including team size, required GPA, and expected coursework) so that I can thoroughly evaluate if I’m qualified and interested before applying.
+- As a Student, I want the system to automatically display a list of recommended research positions, ranked by relevance so that I can efficiently find the best opportunities for me.
+- As a Student, I want to apply to multiple research positions so that I can have the best chances of getting a role.
+- As a Student, I want to submit a short statement of interest with my application so that professors are aware of my intent.
+- As a Student, I want to provide a faculty reference for a position that requires one.
+
+### Use Case: Status & Withdrawal 
+- As a Student, I want to view the status of all research applications I have submitted on my dashboard (Pending, Approved, Rejected) so that I know how my current applications are being viewed.
+- As a Student, I want to view the status of my reference requests on my dashboard (Awaiting approval, Recommended, Not Recommended) so that I can further understand the state of my applications.
+- As a Student, I want to withdraw an application that is still in the "Pending" state so that I can no longer be in the pool of applicants for a position I don’t want.
+
 ### Faculty:
--	As a Faculty, I want to activate my preloaded account and complete my profile information so that I can use the system to post research positions efficiently.
--	As a Faculty, I want to receive a confirmation email for account activation so that my identity is tied to my account.
--	As a Faculty, I want to log in using my WPI email and password (or SSO) so that I can access my saved information securely.
--	Use Case: View Account (Griffin)
--	As a Faculty, I want to view my account profile information so that I can ensure my information is correct and review it as needed.
--	As a Faculty, I want to view any recommendation requests I have received directly on my profile page so I can simply and efficiently approve or reject them.
-### Use Case: Managing Positions (Sandra)
--	As a Faculty, I want to create one or more undergraduate research positions and enter all required details and qualifications so that students can see and apply for the opportunity.
--	As a Faculty, I want to have administrative privileges to add, update, or remove items from the predefined system lists (e.g., research topics, programming languages) so that my posted opportunities best reflect my research.
-### Use Case: Managing Applications (Devin)
--	As a Faculty, I want to see a list of all students who have applied for my research positions so that I can determine and select the best-suited applicants.
--	As a Faculty, I want to view the full profile and qualifications of a student applicant (including GPA, coursework, and reference status) so that I am able to fully evaluate how qualified they are.
--	As a Faculty, I want to approve applications for one or more students so that the selected student(s) is aware that they have been accepted to the research position.
--	As a Faculty, I want the system to limit the number of approved students to the maximum team size I specified so that I don’t accidentally hire too many students.
--	As a Faculty, I want to update a student’s application status to "Rejected" so that I can inform the student that they either didn’t meet the qualifications or were not able to be selected at this time.
+- As a Faculty, I want to activate my preloaded account and complete my profile information so that I can use the system to post research positions efficiently.
+- As a Faculty, I want to receive a confirmation email for account activation so that my identity is tied to my account.
+- As a Faculty, I want to log in using my WPI email and password so that I can access my saved information securely.
+- As a Faculty, I want to log in using SSO so that I can access my saved information quickly and securely.
+
+### Use Case: View Account
+- As a Faculty, I want to view my account profile information so that I can ensure my information is correct and review it as needed.
+- As a Faculty, I want to view any recommendation requests I have received directly on my profile page so I can simply and efficiently approve or reject them.
+
+### Use Case: Managing Positions
+- As a Faculty, I want to create one or more undergraduate research positions and enter all required details and qualifications so that students can see and apply for the opportunity.
+- As a Faculty, I want to have administrative privileges to add, update, or remove items from the predefined system lists (e.g., research topics, programming languages) so that my posted opportunities best reflect my research.
+
+
+### Use Case: Managing Applications 
+- As a Faculty, I want to see a list of all students who have applied for my research positions so that I can determine and select the best-suited applicants.
+- As a Faculty, I want to view the full profile and qualifications of a student applicant (including GPA, coursework, and reference status) so that I am able to fully evaluate how qualified they are.
+- As a Faculty, I want to approve applications for one or more students so that the selected student(s) is aware that they have been accepted to the research position.
+- As a Faculty, I want the system to limit the number of approved students to the maximum team size I specified so that I don’t accidentally hire too many students.
+- As a Faculty, I want to update a student’s application status to "Rejected" so that I can inform the student that they either didn’t meet the qualifications or were not able to be selected at this time.
+
 
 ----
 ## 2.3 Use Cases                         
