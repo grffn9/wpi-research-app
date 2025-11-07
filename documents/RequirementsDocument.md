@@ -1,6 +1,6 @@
 # Software Requirements and Use Cases
 
-## Your Project Title
+## Research Application 
 --------
 Prepared by:
 
@@ -26,7 +26,6 @@ Prepared by:
   - [2.3 Use Cases](#23-use-cases)
 - [3. User Interface](#3-user-interface)
 - [4. Product Backlog](#4-product-backlog)
-- [5. References](#4-references)
 
 <a name="revision-history"> </a>
 
@@ -258,10 +257,4 @@ You may use Figma to design your interface:
 
 <a href="https://github.com/WPI-CS3733-2025B/team-teampy/issues"> A Link to our Product Backlog </a>
 
-----
-# 5. References
-
-No references used. 
-
-----
 ----
