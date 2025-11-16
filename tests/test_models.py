@@ -4,7 +4,8 @@ warnings.filterwarnings("ignore")
 from datetime import datetime, timedelta
 import unittest
 from app import create_app, db
-from app.main.models import User, Post, Tag
+from app.faculty.faculty_models import User, Post, Tag
+from app.student.student_models import User, Post, Tag
 from config import Config
 
 
