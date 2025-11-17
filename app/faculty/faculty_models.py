@@ -5,8 +5,13 @@ from app import db
 import sqlalchemy as sqla
 import sqlalchemy.orm as sqlo
 
-class Post(db.Model):
-    id : sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
-    title : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(150))
-    timestamp : sqlo.Mapped[Optional[datetime]] = sqlo.mapped_column(default = lambda : datetime.now(timezone.utc)) 
-    happiness_level : sqlo.Mapped[int] = sqlo.mapped_column(sqla.Integer, default = 3)
+from app.auth.auth_models import User
+
+class Faculty(User):
+    __tablename__='faculty'
+    
+    id : sqlo.Mapped[int] = sqlo.mapped_column(sqla.ForeignKey(User.id), primary_key=True)
+
+    __mapper_args__ = {
+    'polymorphic_identity': 'Faculty'
+    }
