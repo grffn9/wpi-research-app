@@ -8,8 +8,8 @@ from app.student.student_forms import PostForm
 
 from app.student import student_blueprint as bp_student
 
-@bp_main.route('/', methods=['GET'])
-@bp_main.route('/index', methods=['GET'])
+@bp_student.route('/', methods=['GET'])
+@bp_student.route('/index', methods=['GET'])
 def index():
     posts = db.session.scalars(sqla.select(Post).order_by(Post.timestamp.desc()))
     all_posts  = posts.all()     
