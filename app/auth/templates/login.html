@@ -1,10 +1,19 @@
 {% extends "base.html" %}
+{% import 'bootstrap_wtf.html' as wtf %}
 
 {% block content %}
     <h1>Sign In</h1>
-    <!-- TODO: (milestone 3) Include the login form here...  -->
+<form action="" method="POST">
+    {{ form.hidden_tag()}}
+    
+        {{wtf.form_field(form.email)}}
+        {{wtf.form_field(form.password)}}
+        {{wtf.form_field(form.remember_me)}}
+        {{wtf.form_field(form.submit)}}
 
-    <!-- TODO: (milestone 3) Add the URL for user register route. --> 
-    <p>New User? <a href="">Click to Register!</a></p>
+        
+    </form>
+    <p>New User? <a href="{{url_for('auth.SelectFaculty')}}">Click to Register as Faculty!</a></p>
+
 {% endblock %}
 

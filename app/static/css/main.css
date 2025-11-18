@@ -29,3 +29,11 @@ a:hover {
     color: white;
     cursor:pointer;
 }
+
+.flash-container{
+    background:#99c5ee;
+    font-family: Tahoma;
+    font-size:16px;
+    padding: 25px;
+    margin: 10px 0px 10px 0px;
+}

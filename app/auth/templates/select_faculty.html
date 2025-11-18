@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% import 'bootstrap_wtf.html' as wtf %}
+
+{% block content %}
+    <h1>Choose your faculty profile</h1>
+
+
+<table class = "table table-light table-hover table-bordered border-3 align-middle">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for faculty in faculty_list %}
+        <tr>
+            <td>{{ faculty.firstname }} {{ faculty.lastname }}</td>
+            <td>{{ faculty.email }}</td>
+            <td>
+                
+
+                <form action="{{ url_for('auth.register_faculty', faculty_id=faculty.id) }}" method="post" class="ms-3">
+                    <input type="submit" value="Select" class="btn btn-primary">
+                </form>
+
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock %}
