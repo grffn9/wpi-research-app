@@ -14,7 +14,7 @@ class ResearchPosition(db.Model):
     # Primary Key
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    # Required fields from assignment
+    # Required fields
     title:               Mapped[str] = mapped_column(String(150), nullable=False)
     description:         Mapped[str] = mapped_column(Text, nullable=False)
     start_date:          Mapped[date] = mapped_column(Date, nullable=False)
@@ -23,12 +23,9 @@ class ResearchPosition(db.Model):
     min_gpa:             Mapped[float] = mapped_column(nullable=False)
     reference_required:  Mapped[bool] = mapped_column(Boolean, default=False)
 
-    # Timestamps (optional but useful)
-    timestamp: Mapped[datetime] = mapped_column(
-        default=lambda: datetime.now(timezone.utc)
-    )
+    
 
-    # Foreign key → Faculty who created the position
+    # Foreign key - Faculty who created the position
     faculty_id: Mapped[int] = mapped_column(
         ForeignKey("user.id"), nullable=False
     )
@@ -48,10 +45,10 @@ class ResearchPosition(db.Model):
         secondary="position_courses"
     )
 
-    # Applications (one-to-many)
-    applications: Mapped[list["Application"]] = relationship(
+    # Applications (one-to-many) - thought I'd get this in now while looking at the docs but we don't need it yet
+    '''applications: Mapped[list["Application"]] = relationship(
         back_populates="position"
-    )
+    )'''
 
     
 class Major(db.Model):
