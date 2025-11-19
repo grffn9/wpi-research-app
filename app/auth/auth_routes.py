@@ -1,7 +1,8 @@
 
+from flask_mail import Message
 from flask import render_template, flash, redirect, request, url_for
 
-from app import db
+from app import db, mail
 from app.auth import auth_blueprint as bp_auth 
 import sqlalchemy as sqla
 
@@ -32,10 +33,52 @@ def register_faculty(faculty_id):
         return redirect(url_for('auth.login'))
     return render_template('faculty_register.html', form = rform)
 
+@bp_auth.route('/confirm-email/<faculty_id>', methods=['GET', 'POST'])
+def confirm_email(faculty_id):
+    faculty = db.session.get(Faculty, faculty_id)    
+    email = faculty.email
+
+    token = current_app.serializer.dumps(email, salt='email-confirm')
+    verify_url = url_for('auth.verify_email', token=token, _external=True)
+
+    html = render_template('verify_email.html', faculty = faculty, verify_url=verify_url)
+
+    # msg = Message("Verification",  sender='researchteampy@gmail.com', recipients=[faculty.email])
+
+    msg = Message(
+        subject="Verify Your Email",
+        recipients=['researchteampy@gmail.com'],
+        html=html,
+        sender=current_app.config['MAIL_USERNAME']
+    )
+    mail.send(msg)
+
+    return render_template('confirmation_sent.html', email=email)
+
+
+@bp_auth.route('/verify/<token>')
+def verify_email(token):
+    try:
+        email = current_app.serializer.loads(token, salt='email-confirm', max_age=3600)
+    except Exception:
+        return render_template('errors/404error.html')
+    
+    faculty = Faculty.query.filter_by(email=email).first_or_404()
+
+    faculty.is_verified = True
+    db.session.commit()
+
+    if faculty is None:
+        return render_template('errors/404error.html')
+
+    return redirect(url_for('auth.register_faculty', faculty_id = faculty.id ))
+
+
+
 
 @bp_auth.route('/user/select-faculty', methods = ['GET'])
 def SelectFaculty():
-    faculty_list = Faculty.query.all()
+    faculty_list = Faculty.query.filter_by(is_verified=False).all()
     return render_template('select_faculty.html', faculty_list=faculty_list)
 
 
@@ -50,14 +93,29 @@ def login():
 
     #if the lform is validated
     if lform.validate_on_submit():
+
         query = sqla.select(User).where(User.email == lform.email.data)
         user = db.session.scalars(query).first()
-        if(user is None) or (user.check_password(lform.password.data) == False):
-            #redirect back to login
-            #Invalid username or password
-            flash('Invalid email or password')
+
+        if user is None:
+            flash('Invalid email or password', 'danger')
             return redirect(url_for('auth.login'))
-        
+
+
+        if user.user_type == 'Faculty':
+            query_faculty =  sqla.select(Faculty).where(Faculty.email == user.email)
+            faculty = db.session.scalars(query_faculty).first()
+
+            if not faculty.is_verified:
+                flash('Faculty account is not verified.')
+                return redirect(url_for('auth.login'))
+
+            if( not faculty.password_hash) or not (user.check_password(lform.password.data)):
+                #redirect back to login
+                #Invalid username or password
+                flash('Invalid email or password')
+                return redirect(url_for('auth.login'))
+       
         #login user and redirect to index page
         login_user(user, remember = lform.remember_me.data)
         flash('the user {} has successfully logged in!'.format(current_user.username))
