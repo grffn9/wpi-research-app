@@ -15,7 +15,7 @@ from app.faculty import faculty_blueprint as bp_faculty
 def index():
     all_positions = db.session.scalars(sqla.select(ResearchPosition)).all()
     # all_posts  = positions.all() 
-    return render_template('./index.html', title="Research Portal", positions=all_positions)
+    return render_template('faculty_index.html', title="Research Portal", positions=all_positions)
 
 @bp_faculty.route('/faculty/profile', methods=['GET'])
 @login_required

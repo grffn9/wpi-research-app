@@ -16,7 +16,7 @@ class Faculty(User):
     id : sqlo.Mapped[int] = sqlo.mapped_column(sqla.ForeignKey(User.id), primary_key=True)
     is_verified: sqlo.Mapped[bool] = sqlo.mapped_column(default=False)
     
-    positions: sqlo.WriteOnlyMapped[ResearchPosition] = relationship(back_populates='faculty')
+    positions: sqlo.WriteOnlyMapped["ResearchPosition"] = relationship(back_populates='faculty')
     __mapper_args__ = {
     'polymorphic_identity': 'Faculty'
     }
