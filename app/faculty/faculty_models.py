@@ -5,8 +5,22 @@ from app import db
 import sqlalchemy as sqla
 import sqlalchemy.orm as sqlo
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, Text, Integer, Date, Boolean, ForeignKey
+from sqlalchemy import String, Text, Integer, Date, Boolean, ForeignKey, text
 
+from app.auth.auth_models import User, ResearchTopic, ProgrammingLanguage
+from app.student.student_models import Major, Course
+
+class Faculty(User):
+    __tablename__='faculty'
+
+    id : sqlo.Mapped[int] = sqlo.mapped_column(sqla.ForeignKey(User.id), primary_key=True)
+    is_verified: sqlo.Mapped[bool] = sqlo.mapped_column(default=False)
+    
+    positions: sqlo.WriteOnlyMapped["ResearchPosition"] = relationship(back_populates='faculty')
+    __mapper_args__ = {
+    'polymorphic_identity': 'Faculty'
+    }
+    
 
 class ResearchPosition(db.Model):
     __tablename__ = "research_position"
@@ -29,7 +43,7 @@ class ResearchPosition(db.Model):
     faculty_id: Mapped[int] = mapped_column(
         ForeignKey("user.id"), nullable=False
     )
-    faculty: Mapped["User"] = relationship(back_populates="positions")
+    faculty: Mapped[Faculty] = relationship(back_populates="positions")
 
     # Many-to-many relationships
     preferred_majors: Mapped[list["Major"]] = relationship(
@@ -45,29 +59,18 @@ class ResearchPosition(db.Model):
         secondary="position_courses"
     )
 
-    # Applications (one-to-many) - thought I'd get this in now while looking at the docs but we don't need it yet
-    '''applications: Mapped[list["Application"]] = relationship(
-        back_populates="position"
-    )'''
+    # Applications (one-to-many)
+    # applications: Mapped[list["Application"]] = relationship(
+    #     back_populates="position"
+    # )
 
-    
-class Major(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=True, nullable=False)
+    def __repr__(self):
+        return '<Position {} - Title: {} - {} - Start: {} - End: {} - Size: {} - GPA: {}>'.format(self.id, self.title, self.description, self.start_date, self.end_date, self.team_size, self.min_gpa)
 
-class ResearchTopic(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=True, nullable=False)
-
-class ProgrammingLanguage(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=True, nullable=False)
-
-class Course(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(20), unique=True, nullable=False)  
-    name = db.Column(db.String(150), nullable=False)
-
+    def get_faculty_name(self):
+        first = db.session.scalars(self.faculty.get_firstname()).first()
+        last = db.session.scalars(self.faculty.get_lastname()).first()
+        return first + ' ' + last
 
 
 # --- Association Table: ResearchPosition - Majors ---
@@ -97,14 +100,3 @@ position_courses = db.Table(
     db.Column("position_id", db.Integer, db.ForeignKey("research_position.id"), primary_key=True),
     db.Column("course_id", db.Integer, db.ForeignKey("course.id"), primary_key=True)
 )
-from app.auth.auth_models import User
-
-class Faculty(User):
-    __tablename__='faculty'
-
-    id : sqlo.Mapped[int] = sqlo.mapped_column(sqla.ForeignKey(User.id), primary_key=True)
-    is_verified: sqlo.Mapped[bool] = sqlo.mapped_column(default=False)
-    
-    __mapper_args__ = {
-    'polymorphic_identity': 'Faculty'
-    }
