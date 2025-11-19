@@ -143,3 +143,15 @@ class Student(User):
     def get_majors(self):
         query = self.majors_of_student.select()
         return db.session.scalars(query).all()
+
+    def get_research_topics(self):
+        query = self.research_topics.select()
+        return db.session.scalars(query).all()
+
+    def get_programming_languages(self):
+        query = self.programming_languages.select()
+        return db.session.scalars(query).all()
+
+    def get_coursework(self):
+        query = self.coursework.select()
+        return db.session.scalars(query).all()
