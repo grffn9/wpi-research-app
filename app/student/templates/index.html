@@ -2,16 +2,16 @@
 
 {% block content %}
 
-    <h1>Welcome to Smile Portal!</h1>
+    <h1>Welcome to the WPI Research Application Portal!</h1>
     <!-- TODO: (milestone1) Display smile count.   -->
-    <h3>Number of smiles:  </h3>
+    <h3>Number of positions:  </h3>
 
     <!-- TODO: (milestone 2) Add the template to render an instance of a `sortForm`. The form should display the sort attribute select box and the "Refresh" submit button.
             Style the `sortorder` form element using the `formselect` CSS element we defined in milestone1 -->
 
     <!-- TODO: (milestone1) Format posts -->
-    {% for post in posts %}
-        {% include '_post.html' %} 
+    {% for position in positions %}
+       <div> {% include '_post.html' %} </div>
     {% endfor %}
   
 {% endblock %}

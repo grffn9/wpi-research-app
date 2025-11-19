@@ -29,3 +29,38 @@ a:hover {
     color: white;
     cursor:pointer;
 }
+
+.posttable { 
+    width: 100%;
+    margin: 2px;
+    padding: 5px;
+}
+
+.post-box{
+    display: flex;
+    vertical-align: middle;
+    background-color: #feef83;
+    border: 2px solid crimson;
+    padding: 5px;
+    margin: 2px; 
+    width: 32%
+}
+
+.posttitle {
+    text-align: center;    
+    font-size: 18px;
+    font-weight: bold;
+    color: crimson;
+    padding: 5px;
+    margin: 5px; 
+    width: 100%;
+}
+
+.flash-container{
+	background: #78b4e6;
+	font-family: Tahoma;
+	font-size: 16px;
+	padding: 25px;
+	margin: 10px 0px 10px 0px;
+    max-height: 25px;
+}

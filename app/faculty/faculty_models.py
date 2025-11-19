@@ -7,6 +7,19 @@ import sqlalchemy.orm as sqlo
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Text, Integer, Date, Boolean, ForeignKey
 
+from app.auth.auth_models import User
+
+class Faculty(User):
+    __tablename__='faculty'
+
+    id : sqlo.Mapped[int] = sqlo.mapped_column(sqla.ForeignKey(User.id), primary_key=True)
+    is_verified: sqlo.Mapped[bool] = sqlo.mapped_column(default=False)
+    
+    positions: sqlo.WriteOnlyMapped[ResearchPosition] = relationship(back_populates='faculty')
+    __mapper_args__ = {
+    'polymorphic_identity': 'Faculty'
+    }
+    
 
 class ResearchPosition(db.Model):
     __tablename__ = "research_position"
@@ -32,7 +45,7 @@ class ResearchPosition(db.Model):
     faculty_id: Mapped[int] = mapped_column(
         ForeignKey("user.id"), nullable=False
     )
-    faculty: Mapped["User"] = relationship(back_populates="positions")
+    faculty: Mapped[Faculty] = relationship(back_populates="positions")
 
     # Many-to-many relationships
     preferred_majors: Mapped[list["Major"]] = relationship(
@@ -52,6 +65,11 @@ class ResearchPosition(db.Model):
     applications: Mapped[list["Application"]] = relationship(
         back_populates="position"
     )
+
+    def get_faculty_name(self):
+        first = db.session.scalars(self.faculty.get_firstname())
+        last = db.session.scalars(self.faculty.get_lastname())
+        return first + ' ' + last
 
     
 class Major(db.Model):

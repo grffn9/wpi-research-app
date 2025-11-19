@@ -241,15 +241,15 @@ You may use Figma to design your interface:
 
   Example images. The image files are in the `./images` directory.
   <kbd>
-      <img src="images/signup.png"  border="2">
-      <img src="images/login.png"  border="2">
-      <img src="images/makepos.png"  border="2">
-      <img src="images/positions.png"  border="2">
-      <img src="images/fullresearchposition.png"  border="2">
-      <img src="images/applications.png"  border="2">
-      <img src="images/applicant.png"  border="2">
-      <img src="images/appstatus.png"  border="2">
-      <img src="images/vieworedit.png"  border="2"> 
+      <img src="/documents/images/signup.png" border="2">
+      <img src="/documents/images/login.png"  border="2">
+      <img src="/documents/images/makepos.png"  border="2">
+      <img src="/documents/images/positions.png"  border="2">
+      <img src="/documents/images/fullresearchposition.png"  border="2">
+      <img src="/documents/images/applications.png"  border="2">
+      <img src="/documents/images/applicant.png"  border="2">
+      <img src="/documents/images/appstatus.png"  border="2">
+      <img src="/documents/images/vieworedit.png"  border="2"> 
   </kbd>
   
 ----
