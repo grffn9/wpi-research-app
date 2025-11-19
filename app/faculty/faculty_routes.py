@@ -13,7 +13,7 @@ from app.faculty.faculty_models import ResearchPosition
 from app.faculty.faculty_forms import ResearchPositionForm
 from app import db
 from app.faculty.faculty_models import ResearchPosition
-from app.faculty.faculty_forms import EmptyForm
+# from app.faculty.faculty_forms import EmptyForm
 from flask_login import login_user, current_user, logout_user, login_required
 from app.faculty import faculty_blueprint as bp_faculty
 from app.faculty.faculty_models import (ResearchPosition, Major, ResearchTopic, ProgrammingLanguage, Course)

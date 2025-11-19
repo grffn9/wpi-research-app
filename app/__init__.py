@@ -32,7 +32,7 @@ def create_app(config_class=Config):
     login.init_app(app)
     mail.init_app(app)
 
-    app.serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    app.serializer = URLSafeTimedSerializer(os.environ.get('SECRET_KEY'))
 
     # blueprint registration
     from app.faculty import faculty_blueprint as faculty
