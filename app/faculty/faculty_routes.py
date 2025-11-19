@@ -23,18 +23,16 @@ def create_position():
     form = ResearchPositionForm()
 
     if form.validate_on_submit():
-
         
         deadline_value = None
-        if form.deadline.data:
-            deadline_value = datetime.strptime(form.deadline.data, "%Y-%m-%d")
+        if form.end_date.data:
+            deadline_value = form.end_date.data
 
         # Create position
         position = ResearchPosition(
             title=form.title.data,
             description=form.description.data,
             required_qualifications=form.required_qualifications.data,
-            preferred_qualifications=form.preferred_qualifications.data,
             deadline=deadline_value,
             num_positions=form.num_positions.data,
             faculty_id=current_user.id,
@@ -101,8 +99,8 @@ def edit_position(position_id):
         form.courses.data    = [c.id for c in position.courses]
 
         # Format date
-        if position.deadline:
-            form.deadline.data = position.deadline.strftime("%Y-%m-%d")
+        if position.end_date:
+            form.end_date.data = position.end_date.strftime("%Y-%m-%d")
 
     if form.validate_on_submit():
 
@@ -114,9 +112,9 @@ def edit_position(position_id):
         position.num_positions = form.num_positions.data
 
         # Update deadline
-        position.deadline = None
-        if form.deadline.data:
-            position.deadline = datetime.strptime(form.deadline.data, "%Y-%m-%d")
+        position.end_date = None
+        if form.end_date.data:
+            position.end_date = datetime.strptime(form.end_date.data, "%Y-%m-%d")
 
         # Clear and replace many-to-many
         position.majors    = Major.query.filter(Major.id.in_(form.majors.data)).all()
@@ -131,7 +129,7 @@ def edit_position(position_id):
 
     return render_template("faculty/edit_position.html", form=form, position=position)
 
-@bp_faculty.route('/', methods=['GET'])
+
 @bp_faculty.route('/faculty/index', methods=['GET'])
 @login_required
 def index():

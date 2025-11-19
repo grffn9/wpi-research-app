@@ -137,7 +137,7 @@ def register_student():
         instructor_choices=[(i.id, i.name) for i in get_instructors()]
     )
 
-
+@bp_auth.route('/', methods=['GET'])
 @bp_auth.route('/user/login', methods = ['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
