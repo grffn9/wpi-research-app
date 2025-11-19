@@ -1,0 +1,15 @@
+
+
+{% extends "base.html" %}
+
+{% block content %}
+<title>Confirmation Email Sent</title>
+    <body>
+        <div>
+            <h2>Confirmation Email Sent</h2>
+            <p>An email has been sent to <strong>{{ email }}</strong>.</p>
+            <p>Please check your inbox and click the verification button to continue your registration.</p>
+            <p>If you don't see the email, check your spam folder or try again later.</p>
+        </div>
+    </body>
+{% endblock %}
