@@ -12,7 +12,6 @@ from app.student.student_models import StudentCourse
 from app.student import student_blueprint as bp_student
 
 # @bp_student.route('/', methods=['GET'])
-@bp_student.route('/', methods=['GET'])
 @bp_student.route('/student/index', methods=['GET'])
 @login_required
 def index():

@@ -111,9 +111,12 @@ def register_student():
         )
         student.set_password(form.password.data)
 
-        student.majors_of_student.add_all(form.majors.data)
-        student.research_topics.add_all(form.research_topics.data)
-        student.programming_languages.add_all(form.programming_languages.data)
+        for major in form.majors.data:
+            student.majors_of_student.append(major)
+        for topic in form.research_topics.data:
+            student.research_topics.append(topic)
+        for lang in form.programming_languages.data:
+            student.programming_languages.append(lang)
 
         for entry in form.coursework.data:
             coursework_entry = StudentCourse(
@@ -121,7 +124,7 @@ def register_student():
                 instructor=entry['instructor'],
                 grade=entry['grade'],
             )
-            student.coursework.add(coursework_entry)
+            student.coursework.append(coursework_entry)
 
         db.session.add(student)
         db.session.commit()
@@ -134,7 +137,7 @@ def register_student():
         instructor_choices=[(i.id, i.name) for i in get_instructors()]
     )
 
-
+@bp_auth.route('/', methods=['GET'])
 @bp_auth.route('/user/login', methods = ['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
