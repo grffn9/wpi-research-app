@@ -18,8 +18,8 @@ login = LoginManager()
 login.login_view = 'auth.login'
 
 mail = Mail()
-load_dotenv()
-serializer = URLSafeTimedSerializer(os.environ.get('SECRET_KEY'))
+
+serializer = URLSafeTimedSerializer(Config.SECRET_KEY)
 
 def create_app(config_class=Config):
     app = Flask(__name__)
