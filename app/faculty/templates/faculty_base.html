@@ -22,6 +22,7 @@
                 <td><a href="{{ url_for('student.index') }}" class = "button">Research</a></td>
                 <td><a href="{{ url_for('auth.logout') }}" class = "button"> Logout </a></td>
                 <td><a href="{{ url_for('faculty.viewProfile')}}" class = "button">View Profile</td>
+                <td><a href="{{ url_for('faculty.create_position')}}"></a></td>
                 <td> Current user is: <span class="useritem">{{ current_user.username }}</span> </td>
                 {% else %}
                 <td><a href="{{ url_for('auth.SelectFaculty') }}" class = "button">Faculty Registration</a></td>

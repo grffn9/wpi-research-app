@@ -13,7 +13,6 @@ from app.faculty.faculty_models import ResearchPosition
 from app.faculty.faculty_forms import ResearchPositionForm
 from app import db
 from app.faculty.faculty_models import ResearchPosition
-from app.faculty.faculty_forms import EmptyForm
 from flask_login import login_user, current_user, logout_user, login_required
 from app.faculty import faculty_blueprint as bp_faculty
 from app.faculty.faculty_models import (ResearchPosition, Major, ResearchTopic, ProgrammingLanguage, Course)
@@ -74,7 +73,7 @@ def create_position():
         flash("Research position created!", "success")
         return redirect(url_for("faculty.view_positions"))
 
-    return render_template("faculty/create_position.html", form=form)
+    return render_template("create_research_project.html", form=form)
 
 
 
