@@ -2,7 +2,7 @@ from typing import Optional, List
 from app import db
 import sqlalchemy as sqla
 import sqlalchemy.orm as sqlo
-from app.auth.auth_models import User
+from app.auth.auth_models import User, ResearchTopic, ProgrammingLanguage
 
 # Association Tables
 student_research_topics = db.Table('student_research_topics',
@@ -22,20 +22,6 @@ students_majors_table = db.Table(
     sqla.Column('major_id', sqla.Integer, sqla.ForeignKey('major.id'), primary_key=True)
 )
 
-class ResearchTopic(db.Model):
-    id : sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
-    name : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(100), unique=True)
-    
-    def __repr__(self):
-        return self.name
-
-class ProgrammingLanguage(db.Model):
-    id : sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
-    name : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(100), unique=True)
-
-    def __repr__(self):
-        return self.name
-
 class Instructor(db.Model):
     id : sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
     name : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(100))
@@ -49,6 +35,7 @@ class Grade(db.Model):
 
     def __repr__(self):
         return self.value
+
 
 class Major(db.Model):
     id : sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
