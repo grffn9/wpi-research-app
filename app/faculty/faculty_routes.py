@@ -4,6 +4,8 @@ from flask import render_template, flash, redirect, url_for
 from flask_login import login_user, current_user, logout_user, login_required
 
 import sqlalchemy as sqla
+
+import sqlalchemy as sqla
 from datetime import datetime
 from flask_login import current_user, login_required
 from app.faculty.faculty_models import ResearchPosition
