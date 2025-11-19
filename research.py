@@ -1,7 +1,7 @@
 from config import Config
 from app.auth.auth_models import User
 from app.faculty.faculty_models import Faculty
-from app import create_app, db
+from app import create_app, db, mail
 import sqlalchemy as sqla
 import sqlalchemy.orm as sqlo
 

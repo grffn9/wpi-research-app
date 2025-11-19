@@ -3,11 +3,21 @@ from typing import Optional
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
+from app import login
 
 from app import db
 import sqlalchemy as sqla
 import sqlalchemy.orm as sqlo
 
+
+@login.user_loader
+def load_user(id):
+    return db.session.get(User, int(id))
+
+class User(db.Model,UserMixin):
+    __tablename__='user'
 
 @login.user_loader
 def load_user(id):
