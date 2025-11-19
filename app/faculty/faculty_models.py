@@ -62,9 +62,9 @@ class ResearchPosition(db.Model):
     )
 
     # Applications (one-to-many)
-    applications: Mapped[list["Application"]] = relationship(
-        back_populates="position"
-    )
+    # applications: Mapped[list["Application"]] = relationship(
+    #     back_populates="position"
+    # )
 
     def get_faculty_name(self):
         first = db.session.scalars(self.faculty.get_firstname())

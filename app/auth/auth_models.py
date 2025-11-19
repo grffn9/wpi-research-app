@@ -16,9 +16,6 @@ import sqlalchemy.orm as sqlo
 def load_user(id):
     return db.session.get(User, int(id))
 
-class User(db.Model,UserMixin):
-    __tablename__='user'
-
 @login.user_loader
 def load_user(id):
     return db.session.get(User, int(id))
@@ -37,6 +34,9 @@ class User(db.Model,UserMixin):
     'polymorphic_identity': 'User',
     'polymorphic_on': user_type
     }
+
+    def __repr__(self):
+        return '<User {} {} - {} - {} - {}>'.format(self.firstname, self.lastname, self.username, self.email, self.user_type)
 
     def set_password(self,password):
         self.password_hash=generate_password_hash(password)

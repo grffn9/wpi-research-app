@@ -4,8 +4,8 @@ from flask import render_template, flash, redirect, url_for
 import sqlalchemy as sqla
 
 from app import db
-from app.faculty.faculty_models import Post
-from app.faculty.faculty_forms import PostForm
+from app.faculty.faculty_models import ResearchPosition
+from app.faculty.faculty_forms import EmptyForm
 from flask_login import login_user, current_user, logout_user, login_required
 from app.faculty import faculty_blueprint as bp_faculty
 
