@@ -1,0 +1,12 @@
+
+{% block content %}
+
+    <p>Hello {{ faculty.firstname }} {{ faculty.lastname }},</p>
+
+    <p>Please click the link below to verify your email and complete your registration:</p>
+
+    <a href="{{ verify_url }}" >Verify Email</a>
+
+    <p>If you didn’t request this, you can ignore this email.</p>
+
+{% endblock %}
