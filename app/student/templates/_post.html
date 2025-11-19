@@ -5,25 +5,18 @@
             </td>
         </tr>
         <tr>
-            <td width="80%" >
+            <td width="100%" >
                 <!--  TODO: include post body in the following div element and style it. -->    
-                <div> {{position.body}} </div> <br> 
+                <div class="postbody"> {{position.description}} </div> <br> 
                 <!-- (milestone3) TODO: format the timestamp; display as local date/time-->
                 
             </td> 
-        </tr>
-        <tr> 
-            <td colspan="3" style = "text-align:center" valign="bottom">  
-                <br>
-                <!-- get faculty who posted position -->
-                <div> </div>
-            </td>
         </tr>
         <tr>
             <td colspan="3" style = "text-align:center" valign="bottom">  
                 <br>
                     <!-- get faculty who posted position -->
-                    <div> {{position.get_faculty_name()}} </div>
+                    <div class="useritem"> {{position.faculty.get_firstname()}} {{position.faculty.get_lastname}}</div>
             </td>
         </tr>
     </table>

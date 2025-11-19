@@ -3,7 +3,6 @@ from typing import Optional
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login
-from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login
 
@@ -56,3 +55,17 @@ class User(db.Model,UserMixin):
     def get_username(self):
         return self.username
 
+
+class ResearchTopic(db.Model):
+    id : sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
+    name : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(100), unique=True)
+    
+    def __repr__(self):
+        return self.name
+
+class ProgrammingLanguage(db.Model):
+    id : sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
+    name : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(100), unique=True)
+
+    def __repr__(self):
+        return self.name

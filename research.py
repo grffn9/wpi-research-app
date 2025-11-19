@@ -34,14 +34,14 @@ def add_faculty(*args, **kwargs):
     query = sqla.select(Faculty)
     if db.session.scalars(query).first() is None:
         faculty_members = [
-        {'firstname':'John','lastname':'Doe','email':'john.doe@example.com', 'is_verified': False},
+        {'firstname':'John','lastname':'Doe', 'email':'john.doe@example.com', 'is_verified': True},
           {'firstname':'Jane','lastname':'Smith','email':'jane.smith@example.com', 'is_verified': False},
           {'firstname':'Jim','lastname':'Brown','email':'jim.brown@example.com', 'is_verified': False},
           {'firstname':'Harry','lastname':'Davis','email':'harry.davis@example.com', 'is_verified': False}, 
           {'firstname':'Lisa','lastname':'Wilson','email':'lisa.wilson@example.com', 'is_verified': False}  ]
         for m in faculty_members:
             db.session.add(Faculty(firstname = m['firstname'], lastname = m['lastname'], email = m['email'], is_verified = m['is_verified']))
-        db.session.commit()
+        john = db.session.scalars(sqla.select(Faculty).where(Faculty.email == 'john.doe@example.com')).first()
 
 
 @sqla.event.listens_for(Major.__table__, 'after_create')

@@ -5,9 +5,10 @@ from app import db
 import sqlalchemy as sqla
 import sqlalchemy.orm as sqlo
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, Text, Integer, Date, Boolean, ForeignKey
+from sqlalchemy import String, Text, Integer, Date, Boolean, ForeignKey, text
 
-from app.auth.auth_models import User
+from app.auth.auth_models import User, ResearchTopic, ProgrammingLanguage
+from app.student.student_models import Major, Course
 
 class Faculty(User):
     __tablename__='faculty'
@@ -66,29 +67,13 @@ class ResearchPosition(db.Model):
     #     back_populates="position"
     # )
 
+    def __repr__(self):
+        return '<Position {} - Title: {} - {} - Start: {} - End: {} - Size: {} - GPA: {}>'.format(self.id, self.title, self.description, self.start_date, self.end_date, self.team_size, self.min_gpa)
+
     def get_faculty_name(self):
-        first = db.session.scalars(self.faculty.get_firstname())
-        last = db.session.scalars(self.faculty.get_lastname())
+        first = db.session.scalars(self.faculty.get_firstname()).first()
+        last = db.session.scalars(self.faculty.get_lastname()).first()
         return first + ' ' + last
-
-    
-class Major(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=True, nullable=False)
-
-class ResearchTopic(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=True, nullable=False)
-
-class ProgrammingLanguage(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=True, nullable=False)
-
-class Course(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(20), unique=True, nullable=False)  
-    name = db.Column(db.String(150), nullable=False)
-
 
 
 # --- Association Table: ResearchPosition - Majors ---

@@ -25,13 +25,13 @@ a:hover {
     border: 1px solid lightgray;
 }
 .button:hover {
-    background-color: 157dd3;
+    background-color: #157dd3;
     color: white;
     cursor:pointer;
 }
 
 .posttable { 
-    width: 100%;
+    width: 30%;
     margin: 2px;
     padding: 5px;
 }
@@ -39,10 +39,11 @@ a:hover {
 .post-box{
     display: flex;
     vertical-align: middle;
-    background-color: #feef83;
-    border: 2px solid crimson;
+    background-color: #f6f6f6;
+    border: 2px solid #2387D9;
+    border-radius: 2px;
     padding: 5px;
-    margin: 2px; 
+    margin: 10px 2px 10px 2px; 
     width: 32%
 }
 
@@ -50,7 +51,15 @@ a:hover {
     text-align: center;    
     font-size: 18px;
     font-weight: bold;
-    color: crimson;
+    color: #2387D9;
+    padding: 5px;
+    margin: 5px; 
+    width: 100%;
+}
+.postbody {
+    text-align: center;    
+    font-size: 16px;
+    color: black;
     padding: 5px;
     margin: 5px; 
     width: 100%;
@@ -63,4 +72,30 @@ a:hover {
 	padding: 25px;
 	margin: 10px 0px 10px 0px;
     max-height: 25px;
+}
+
+@media screen and (min-width: 1200){
+    .post-box{
+        width: 32%;
+    }
+}
+
+@media screen and (min-width: 800px) and (max-width:1200px){
+    .post-box{
+        width: 48%;
+    }
+}
+
+@media screen and (max-width: 800px){
+    .post-box{
+        width: 99%;
+    }
+}
+
+.useritem{
+    text-align: center;
+    padding: 3px;
+    margin: 2px 1px 2px 1px;
+    color: #157dd3; 
+    text-transform: uppercase;
 }
