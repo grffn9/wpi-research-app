@@ -8,6 +8,7 @@ from app import db
 import sqlalchemy as sqla
 from app.auth.auth_models import  User
 from app.student.student_models import (Student, Major, ResearchTopic, ProgrammingLanguage, Course, Instructor, Grade)
+from app.student.student_forms import CourseworkForm, get_courses, get_grades, get_instructors
 
 def get_majors():
     return db.session.scalars(sqla.select(Major).order_by(Major.name)).all()
@@ -17,15 +18,6 @@ def get_research_topics():
 
 def get_languages():
     return db.session.scalars(sqla.select(ProgrammingLanguage).order_by(ProgrammingLanguage.name)).all()
-
-def get_courses():
-    return db.session.scalars(sqla.select(Course).order_by(Course.coursenum)).all()
-
-def get_instructors():
-    return db.session.scalars(sqla.select(Instructor).order_by(Instructor.name)).all()
-
-def get_grades():
-    return db.session.scalars(sqla.select(Grade).order_by(Grade.value)).all()
 
 class FacultyRegistrationForm(FlaskForm):
    
@@ -51,27 +43,6 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember me')
     submit= SubmitField('Sign In')
-
-
-class CourseworkForm(Form):
-    course = QuerySelectField(
-        'Advanced Course',
-        query_factory=get_courses,
-        get_label=lambda c: f"{c.coursenum} - {c.title}",
-        allow_blank=False
-    )
-    grade = QuerySelectField(
-        'Grade Earned',
-        query_factory=get_grades,
-        get_label='value',
-        allow_blank=False
-    )
-    instructor = QuerySelectField(
-        'Instructor',
-        query_factory=get_instructors,
-        get_label='name',
-        allow_blank=False
-    )
 
 
 class StudentRegistrationForm(FlaskForm):

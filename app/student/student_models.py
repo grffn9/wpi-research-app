@@ -109,36 +109,34 @@ class Student(User):
     }
 
     # Relationships
-    majors_of_student : sqlo.WriteOnlyMapped['Major'] = sqlo.relationship(
+    majors_of_student : sqlo.Mapped[List['Major']] = sqlo.relationship(
         secondary=students_majors_table,
         back_populates='students_in_major',
     )
     
-    research_topics : sqlo.WriteOnlyMapped['ResearchTopic'] = sqlo.relationship(
+    research_topics : sqlo.Mapped[List['ResearchTopic']] = sqlo.relationship(
         secondary=student_research_topics,
     )
     
-    programming_languages : sqlo.WriteOnlyMapped['ProgrammingLanguage'] = sqlo.relationship(
+    programming_languages : sqlo.Mapped[List['ProgrammingLanguage']] = sqlo.relationship(
         secondary=student_programming_languages,
     )
     
-    coursework : sqlo.WriteOnlyMapped['StudentCourse'] = sqlo.relationship(back_populates='student')
+    coursework : sqlo.Mapped[List['StudentCourse']] = sqlo.relationship(back_populates='student', cascade="all, delete-orphan")
 
     def __repr__(self):
         return '<Student {} - {} - {} {}>'.format(self.id, self.username, self.firstname, self.lastname)
 
     def get_majors(self):
-        query = self.majors_of_student.select()
-        return db.session.scalars(query).all()
+        return self.majors_of_student
 
     def get_research_topics(self):
-        query = self.research_topics.select()
-        return db.session.scalars(query).all()
+        return self.research_topics
 
     def get_programming_languages(self):
-        query = self.programming_languages.select()
-        return db.session.scalars(query).all()
+        return self.programming_languages
 
     def get_coursework(self):
+        return self.coursework
         query = self.coursework.select()
         return db.session.scalars(query).all()
