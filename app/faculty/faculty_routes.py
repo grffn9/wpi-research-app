@@ -8,12 +8,10 @@ import sqlalchemy as sqla
 
 import sqlalchemy as sqla
 from datetime import datetime
-from flask_login import current_user, login_required
 from app.faculty.faculty_models import ResearchPosition
 from app.faculty.faculty_forms import ResearchPositionForm
 from app import db
 from app.faculty.faculty_models import ResearchPosition
-from flask_login import login_user, current_user, logout_user, login_required
 from app.faculty import faculty_blueprint as bp_faculty
 from app.faculty.faculty_models import (ResearchPosition, Major, ResearchTopic, ProgrammingLanguage, Course)
 
@@ -21,55 +19,67 @@ from app.faculty.faculty_models import (ResearchPosition, Major, ResearchTopic, 
 @login_required
 def create_position():
     form = ResearchPositionForm()
-
-    if form.validate_on_submit():
         
-        deadline_value = None
-        if form.end_date.data:
-            deadline_value = form.end_date.data
+    form.preferred_majors.choices = [
+        (m.id, m.name) for m in Major.query.order_by(Major.name)]
+
+    form.research_topics.choices = [
+        (t.id, t.name) for t in ResearchTopic.query.order_by(ResearchTopic.name)]
+       
+    form.programming_languages.choices = [
+        (l.id, l.name) for l in ProgrammingLanguage.query.order_by(ProgrammingLanguage.name)]
+        
+    form.required_courses.choices = [
+        (c.id, f"{c.coursenum} — {c.title}") for c in Course.query.order_by(Course.coursenum)]
+    
+    if form.validate_on_submit():
 
         # Create position
         position = ResearchPosition(
             title=form.title.data,
             description=form.description.data,
-            required_qualifications=form.required_qualifications.data,
-            deadline=deadline_value,
-            num_positions=form.num_positions.data,
-            faculty_id=current_user.id,
+            start_date=form.start_date.data,
+            end_date=form.end_date.data,
+            team_size=form.team_size.data,
+            min_gpa=form.min_gpa.data,
+            reference_required=form.reference_required.data,
         )
 
         # --- Many-to-Many Selections ---
         # Majors
-        if form.majors.data:
-            selected_majors = Major.query.filter(Major.id.in_(form.majors.data)).all()
-            position.majors.extend(selected_majors)
+        if form.preferred_majors.data:
+            selected_majors = Major.query.filter(Major.id.in_(form.preferred_majors.data)).all()
+            position.preferred_majors.extend(selected_majors)
 
         # Topics
-        if form.topics.data:
+        if form.research_topics.data:
             selected_topics = ResearchTopic.query.filter(
-                ResearchTopic.id.in_(form.topics.data)
+                ResearchTopic.id.in_(form.research_topics.data)
             ).all()
-            position.topics.extend(selected_topics)
+            position.research_topics.extend(selected_topics)
 
         # Languages
-        if form.languages.data:
+        if form.programming_languages.data:
             selected_langs = ProgrammingLanguage.query.filter(
-                ProgrammingLanguage.id.in_(form.languages.data)
+                ProgrammingLanguage.id.in_(form.programming_languages.data)
             ).all()
-            position.languages.extend(selected_langs)
-
+            position.programming_languages.extend(selected_langs)
+        
         # Courses
-        if form.courses.data:
+        if form.required_courses.data:
             selected_courses = Course.query.filter(
-                Course.id.in_(form.courses.data)
+                Course.id.in_(form.required_courses.data)
             ).all()
-            position.courses.extend(selected_courses)
+            position.required_courses.extend(selected_courses)
+
+        #This is why there was an error with posting positions
+        position.faculty = current_user
 
         db.session.add(position)
         db.session.commit()
 
         flash("Research position created!", "success")
-        return redirect(url_for("faculty.view_positions"))
+        return redirect(url_for("faculty.viewProfile"))
 
     return render_template("create_research_project.html", form=form)
 
@@ -91,6 +101,19 @@ def edit_position(position_id):
         abort(403)
 
     form = ResearchPositionForm(obj=position)
+
+
+    form.preferred_majors.choices = [
+        (m.id, m.name) for m in Major.query.order_by(Major.name)]
+
+    form.research_topics.choices = [
+        (t.id, t.name) for t in ResearchTopic.query.order_by(ResearchTopic.name)]
+       
+    form.programming_languages.choices = [
+        (l.id, l.name) for l in ProgrammingLanguage.query.order_by(ProgrammingLanguage.name)]
+        
+    form.required_courses.choices = [
+        (c.id, f"{c.coursenum} — {c.title}") for c in Course.query.order_by(Course.coursenum)]
 
     if request.method == "GET":
         form.majors.data     = [m.id for m in position.majors]
@@ -125,7 +148,7 @@ def edit_position(position_id):
         db.session.commit()
 
         flash("Position updated!", "success")
-        return redirect(url_for("faculty.view_positions"))
+        return redirect(url_for("faculty.viewProfile"))
 
     return render_template("faculty/edit_position.html", form=form, position=position)
 

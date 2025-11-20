@@ -16,14 +16,14 @@ class Faculty(User):
     id : sqlo.Mapped[int] = sqlo.mapped_column(sqla.ForeignKey(User.id), primary_key=True)
     is_verified: sqlo.Mapped[bool] = sqlo.mapped_column(default=False)
     
-    positions: sqlo.WriteOnlyMapped[ResearchPosition] = relationship(back_populates='faculty')
+    positions: sqlo.WriteOnlyMapped['ResearchPosition'] = relationship(back_populates='faculty')
     __mapper_args__ = {
     'polymorphic_identity': 'Faculty'
     }
     
 
 class ResearchPosition(db.Model):
-    __tablename__ = "research_position"
+    __tablename__ = 'research_position'
 
     # Primary Key
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -37,12 +37,8 @@ class ResearchPosition(db.Model):
     min_gpa:             Mapped[float] = mapped_column(nullable=False)
     reference_required:  Mapped[bool] = mapped_column(Boolean, default=False)
 
-    # Timestamps (optional but useful)
-    # timestamp: Mapped[datetime] = mapped_column(
-    #     default=lambda: datetime.now(timezone.utc)
-    # )
-
-    # Foreign key → Faculty who created the position
+    
+    # Foreign key for Faculty who created the position
     faculty_id: Mapped[int] = mapped_column(
         ForeignKey("user.id"), nullable=False
     )
