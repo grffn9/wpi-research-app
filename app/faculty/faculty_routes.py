@@ -48,28 +48,29 @@ def create_position():
         # --- Many-to-Many Selections ---
         # Majors
         if form.preferred_majors.data:
-            selected_majors = Major.query.filter(Major.id.in_(form.preferred_majors.data)).all()
+            major_ids = [m.id for m in form.preferred_majors.data]
+            selected_majors = Major.query.filter(Major.id.in_(major_ids)).all()
             position.preferred_majors.extend(selected_majors)
 
         # Topics
         if form.research_topics.data:
+            topic_ids = [t.id if hasattr(t, "id") else int(t) for t in form.research_topics.data]
             selected_topics = ResearchTopic.query.filter(
-                ResearchTopic.id.in_(form.research_topics.data)
-            ).all()
+            ResearchTopic.id.in_(topic_ids)).all()
             position.research_topics.extend(selected_topics)
 
         # Languages
         if form.programming_languages.data:
+            lang_ids = [l.id if hasattr(l, "id") else int(l) for l in form.programming_languages.data]
             selected_langs = ProgrammingLanguage.query.filter(
-                ProgrammingLanguage.id.in_(form.programming_languages.data)
-            ).all()
+            ProgrammingLanguage.id.in_(lang_ids)).all()
             position.programming_languages.extend(selected_langs)
         
         # Courses
         if form.required_courses.data:
+            course_ids = [c.id if hasattr(c, "id") else int(c) for c in form.required_courses.data]
             selected_courses = Course.query.filter(
-                Course.id.in_(form.required_courses.data)
-            ).all()
+            Course.id.in_(course_ids)).all()
             position.required_courses.extend(selected_courses)
 
         #This is why there was an error with posting positions

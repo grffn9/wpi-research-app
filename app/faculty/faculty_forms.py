@@ -1,7 +1,10 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, IntegerField, FloatField,BooleanField, SelectMultipleField, DateField
+from wtforms import StringField, SubmitField, IntegerField, FloatField,BooleanField, SelectMultipleField, DateField, widgets
 from wtforms.validators import  ValidationError, DataRequired
+from wtforms_sqlalchemy.fields import QuerySelectMultipleField, QuerySelectField
 from datetime import datetime
+from app.faculty.faculty_models import Major, Course
+from app.auth.auth_models import ResearchTopic, ProgrammingLanguage
 from wtforms.validators import ValidationError, DataRequired
 from app import db
 import sqlalchemy as sqla
@@ -18,11 +21,37 @@ class ResearchPositionForm(FlaskForm):
     min_gpa = FloatField("Minimum GPA", validators=[DataRequired()])
     reference_required = BooleanField("Reference Required?")
 
-    # Many-to-many (populated dynamically in the view)
-    preferred_majors = SelectMultipleField("Preferred Majors", coerce=int)
-    research_topics = SelectMultipleField("Research Topics", coerce=int)
-    programming_languages = SelectMultipleField("Programming Languages", coerce=int)
-    required_courses = SelectMultipleField("Required Courses", coerce=int)
+    preferred_majors = QuerySelectMultipleField(
+        'Preferred Majors',
+        query_factory=lambda: db.session.scalars(sqla.select(Major)).all(),
+        get_label='name',
+        widget=widgets.ListWidget(prefix_label=False),
+        option_widget=widgets.CheckboxInput()
+    )
+
+    research_topics = QuerySelectMultipleField(
+        'Research Topics',
+        query_factory=lambda: db.session.scalars(sqla.select(ResearchTopic)).all(),
+        get_label='name',
+        widget=widgets.ListWidget(prefix_label=False),
+        option_widget=widgets.CheckboxInput()
+    )
+
+    programming_languages = QuerySelectMultipleField(
+        'Programming Languages',
+        query_factory=lambda: db.session.scalars(sqla.select(ProgrammingLanguage)).all(),
+        get_label='name',
+        widget=widgets.ListWidget(prefix_label=False),
+        option_widget=widgets.CheckboxInput()
+    )
+
+    required_courses = QuerySelectMultipleField(
+        'Required Courses',
+        query_factory=lambda: db.session.scalars(sqla.select(Course)).all(),
+        get_label='title',
+        widget=widgets.ListWidget(prefix_label=False),
+        option_widget=widgets.CheckboxInput()
+    )
 
     submit = SubmitField("Save Position")
 

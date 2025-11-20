@@ -142,7 +142,7 @@ def register_student():
 def login():
     if current_user.is_authenticated:
         #choose the correct user
-        return redirect(url_for('student.index'))
+        return redirect(url_for('auth.login'))
 
     lform = LoginForm()
 
@@ -176,7 +176,7 @@ def login():
         flash('The user {} has successfully logged in!'.format(current_user.username))
         
         #choose the correct user with user_type
-        if current_user.user_type == 'faculty':
+        if current_user.user_type == 'Faculty':
             return redirect(url_for('faculty.index'))
         return redirect(url_for('student.index'))
     return render_template('login.html', form = lform)

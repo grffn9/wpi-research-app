@@ -37,10 +37,7 @@ class CourseworkForm(Form):
         allow_blank=False
     )
 
-class PostForm(FlaskForm):
-    title = StringField('Title', validators=[DataRequired()])
-    happiness_level = SelectField('Happiness Level',choices = [(3, 'I can\'t stop smiling'), (2, 'Really happy'), (1,'Happy')])   
-    submit = SubmitField('Post')
+
 
 class EditProfileForm(FlaskForm):
     firstname = StringField('First Name', validators=[DataRequired()])
