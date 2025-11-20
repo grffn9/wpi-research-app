@@ -17,5 +17,5 @@ from app.student import student_blueprint as bp_student
 def index():
     all_positions = db.session.scalars(sqla.select(ResearchPosition)).all()
     # all_posts  = positions.all()     
-    return render_template('./index.html', title="Research Application Portal", positions=all_positions)
+    return render_template('index.html', title="Research Application Portal", positions=all_positions)
 
