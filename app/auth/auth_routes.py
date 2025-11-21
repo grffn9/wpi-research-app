@@ -9,7 +9,8 @@ import sqlalchemy as sqla
 from flask import current_app, url_for
 from flask_login import login_user, current_user, logout_user, login_required
 
-from app.auth.auth_forms import LoginForm, FacultyRegistrationForm, StudentRegistrationForm, get_courses, get_grades, get_instructors
+from app.auth.auth_forms import LoginForm, FacultyRegistrationForm, StudentRegistrationForm
+from app.student.student_forms import get_courses, get_grades, get_instructors
 from app.auth.auth_models import User
 from app.faculty.faculty_models import Faculty
 
@@ -110,9 +111,12 @@ def register_student():
         )
         student.set_password(form.password.data)
 
-        student.majors_of_student.add_all(form.majors.data)
-        student.research_topics.add_all(form.research_topics.data)
-        student.programming_languages.add_all(form.programming_languages.data)
+        for major in form.majors.data:
+            student.majors_of_student.append(major)
+        for topic in form.research_topics.data:
+            student.research_topics.append(topic)
+        for lang in form.programming_languages.data:
+            student.programming_languages.append(lang)
 
         for entry in form.coursework.data:
             coursework_entry = StudentCourse(
@@ -120,7 +124,7 @@ def register_student():
                 instructor=entry['instructor'],
                 grade=entry['grade'],
             )
-            student.coursework.add(coursework_entry)
+            student.coursework.append(coursework_entry)
 
         db.session.add(student)
         db.session.commit()
@@ -133,12 +137,12 @@ def register_student():
         instructor_choices=[(i.id, i.name) for i in get_instructors()]
     )
 
-
+@bp_auth.route('/', methods=['GET'])
 @bp_auth.route('/user/login', methods = ['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         #choose the correct user
-        return redirect(url_for('student.index'))
+        return redirect(url_for('auth.login'))
 
     lform = LoginForm()
 
@@ -172,7 +176,7 @@ def login():
         flash('The user {} has successfully logged in!'.format(current_user.username))
         
         #choose the correct user with user_type
-        if current_user.user_type == 'faculty':
+        if current_user.user_type == 'Faculty':
             return redirect(url_for('faculty.index'))
         return redirect(url_for('student.index'))
     return render_template('login.html', form = lform)

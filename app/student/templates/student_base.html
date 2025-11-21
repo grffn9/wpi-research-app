@@ -20,8 +20,10 @@
             <tr>
                 {% if current_user.is_authenticated %}
                 <td><a href="{{ url_for('student.index') }}" class = "button">Research</a></td>
+                {% if current_user.user_type == 'Student' %}
+                <td><a href="{{ url_for('student.profile') }}" class = "button">View Profile</a></td>
+                {% endif %}
                 <td><a href="{{ url_for('auth.logout') }}" class = "button"> Logout </a></td>
-                <td><a href="{{ url_for('faculty.viewProfile')}}" class = "button">View Profile</td>
                 <td> Current user is: <span class="useritem">{{ current_user.username }}</span> </td>
                 {% else %}
                 <td><a href="{{ url_for('auth.SelectFaculty') }}" class = "button">Faculty Registration</a></td>
