@@ -10,8 +10,9 @@
             Style the `sortorder` form element using the `formselect` CSS element we defined in milestone1 -->
 
     <!-- TODO: (milestone1) Format posts -->
+     <div class="row row-cols-1 row-cols-md-3 g-4">
     {% for position in positions %}
-       <div class="post-box"> {% include '_post.html' %} </div>
+       {% include '_post.html' %} 
     {% endfor %}
-  
+    </div>
 {% endblock %}
