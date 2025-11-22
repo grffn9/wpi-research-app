@@ -34,7 +34,7 @@ def add_faculty(*args, **kwargs):
     query = sqla.select(Faculty)
     if db.session.scalars(query).first() is None:
         faculty_members = [
-        {'firstname':'John','lastname':'Doe', 'email':'john.doe@example.com', 'is_verified': True},
+        {'firstname':'John','lastname':'Doe', 'email':'john.doe@example.com', 'is_verified': False},
           {'firstname':'Jane','lastname':'Smith','email':'jane.smith@example.com', 'is_verified': False},
           {'firstname':'Jim','lastname':'Brown','email':'jim.brown@example.com', 'is_verified': False},
           {'firstname':'Harry','lastname':'Davis','email':'harry.davis@example.com', 'is_verified': False}, 

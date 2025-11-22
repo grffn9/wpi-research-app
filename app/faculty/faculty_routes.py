@@ -157,7 +157,7 @@ def edit_position(position_id):
 @bp_faculty.route('/faculty/index', methods=['GET'])
 @login_required
 def index():
-    all_positions = db.session.scalars(sqla.select(ResearchPosition)).all()
+    all_positions = db.session.scalars(sqla.select(ResearchPosition).where(ResearchPosition.faculty_id == current_user.id)).all()
     # all_posts  = positions.all() 
     return render_template('faculty_index.html', title="Research Portal", positions=all_positions)
 
