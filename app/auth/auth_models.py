@@ -3,11 +3,17 @@ from typing import Optional
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login
+from flask_login import UserMixin
+from app import login
 
 from app import db
 import sqlalchemy as sqla
 import sqlalchemy.orm as sqlo
 
+
+@login.user_loader
+def load_user(id):
+    return db.session.get(User, int(id))
 
 @login.user_loader
 def load_user(id):
@@ -28,8 +34,38 @@ class User(db.Model,UserMixin):
     'polymorphic_on': user_type
     }
 
+    def __repr__(self):
+        return '<User {} {} - {} - {} - {}>'.format(self.firstname, self.lastname, self.username, self.email, self.user_type)
+
     def set_password(self,password):
         self.password_hash=generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+    def get_firstname(self):
+        return self.firstname
+    
+    def get_lastname(self):
+        return self.lastname
+    
+    def get_email(self):
+        return self.email
+
+    def get_username(self):
+        return self.username
+
+
+class ResearchTopic(db.Model):
+    id : sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
+    name : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(100), unique=True)
+    
+    def __repr__(self):
+        return self.name
+
+class ProgrammingLanguage(db.Model):
+    id : sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
+    name : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(100), unique=True)
+
+    def __repr__(self):
+        return self.name

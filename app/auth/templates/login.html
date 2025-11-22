@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "student_base.html" %}
 {% import 'bootstrap_wtf.html' as wtf %}
 
 {% block content %}
@@ -6,14 +6,14 @@
 <form action="" method="POST">
     {{ form.hidden_tag()}}
     
-        {{wtf.form_field(form.email)}}
-        {{wtf.form_field(form.password)}}
+        <div style="max-width: 600px;">{{wtf.form_field(form.email)}}</div>
+        <div style="max-width: 600px;">{{wtf.form_field(form.password)}}</div>
         {{wtf.form_field(form.remember_me)}}
         {{wtf.form_field(form.submit)}}
 
         
     </form>
-    <p>New User? <a href="{{url_for('auth.SelectFaculty')}}">Click to Register as Faculty!</a></p>
+    <p>New User? <a href="{{url_for('auth.SelectFaculty')}}">Register as Faculty</a> or <a href="{{url_for('auth.register_student')}}">Register as Student</a></p>
 
 {% endblock %}
 
