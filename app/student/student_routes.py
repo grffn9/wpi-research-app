@@ -5,9 +5,12 @@ import sqlalchemy as sqla
 
 from app import db
 
-from app.faculty.faculty_models import ResearchPosition
 from app.student.student_forms import EditProfileForm, get_courses, get_grades, get_instructors
-from app.student.student_models import StudentCourse
+# from app.student.student_models import StudentCourse
+from app.models.models import StudentCourse, ResearchPosition
+
+# from app.models.models import Student, ResearchPosition, Application
+
 
 from app.student import student_blueprint as bp_student
 

@@ -7,7 +7,9 @@ from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 from app import db
 import sqlalchemy as sqla
 from app.auth.auth_models import  User
-from app.student.student_models import (Student, Major, ResearchTopic, ProgrammingLanguage, Course, Instructor, Grade)
+# from app.student.student_models import (Student, Major, ResearchTopic, ProgrammingLanguage, Course, Instructor, Grade)
+from app.models.models import (Student, Major, ResearchTopic, ProgrammingLanguage, Course, Instructor, Grade)
+
 from app.student.student_forms import CourseworkForm, get_courses, get_grades, get_instructors
 
 def get_majors():

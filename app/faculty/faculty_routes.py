@@ -6,15 +6,16 @@ from flask import render_template, flash, redirect, url_for
 from flask_login import login_user, current_user, logout_user, login_required
 
 import sqlalchemy as sqla
-
 import sqlalchemy as sqla
 from datetime import datetime
-from app.faculty.faculty_models import ResearchPosition
 from app.faculty.faculty_forms import ResearchPositionForm, AddItemForm
 from app import db
-from app.faculty.faculty_models import ResearchPosition
 from app.faculty import faculty_blueprint as bp_faculty
-from app.faculty.faculty_models import (ResearchPosition, Major, ResearchTopic, ProgrammingLanguage, Course)
+# from app.faculty.faculty_models import Major, ResearchTopic, ProgrammingLanguage, Course
+from app.models.models import Major, ResearchTopic, ProgrammingLanguage, Course
+
+from app.models import Student, ResearchPosition, Application
+
 
 @bp_faculty.route('/create_position', methods=['GET', 'POST'])
 @login_required

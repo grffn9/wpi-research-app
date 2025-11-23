@@ -4,14 +4,15 @@
 
     <h1>Hello Student. Welcome to the WPI Research Application Portal!</h1>
     <!-- TODO: (milestone1) Display smile count.   -->
-    <h3>Number of positions:  </h3>
+    <h3>Number of positions:  </h3><br>
 
     <!-- TODO: (milestone 2) Add the template to render an instance of a `sortForm`. The form should display the sort attribute select box and the "Refresh" submit button.
             Style the `sortorder` form element using the `formselect` CSS element we defined in milestone1 -->
 
     <!-- TODO: (milestone1) Format posts -->
+    <div class="row row-cols-1 row-cols-md-3 g-4">
     {% for position in positions %}
-       <div class="post-box"> {% include '_post.html' %} </div>
+       {% include '_post.html' %} 
     {% endfor %}
-  
+    </div>
 {% endblock %}
