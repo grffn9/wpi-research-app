@@ -4,6 +4,7 @@ import sqlalchemy as sqla
 import sqlalchemy.orm as sqlo
 from app.auth.auth_models import User, ResearchTopic, ProgrammingLanguage
 
+
 # Association Tables
 student_research_topics = db.Table('student_research_topics',
     db.Column('student_id', db.Integer, db.ForeignKey('student.id'), primary_key=True),
@@ -20,6 +21,12 @@ students_majors_table = db.Table(
     db.metadata,
     sqla.Column('student_id', sqla.Integer, sqla.ForeignKey('student.id'), primary_key=True),
     sqla.Column('major_id', sqla.Integer, sqla.ForeignKey('major.id'), primary_key=True)
+)
+
+student_application_table = db.Table(
+    'student_application_table',
+    db.metadata,
+
 )
 
 class Instructor(db.Model):
@@ -45,7 +52,7 @@ class Major(db.Model):
     courses : sqlo.WriteOnlyMapped['Course'] = sqlo.relationship(back_populates= 'major')
     students_in_major : sqlo.WriteOnlyMapped['Student'] = sqlo.relationship(
         secondary=students_majors_table,
-        back_populates='majors_of_student',
+        back_populates='majors_of_student'
     )
     
     def __repr__(self):
@@ -123,6 +130,8 @@ class Student(User):
     )
     
     coursework : sqlo.Mapped[List['StudentCourse']] = sqlo.relationship(back_populates='student', cascade="all, delete-orphan")
+    #applications: sqlo.WriteOnlyMapped['Application'] = sqlo.relationship(back_populates='student', cascade="all, delete-orphan")
+
 
     def __repr__(self):
         return '<Student {} - {} - {} {}>'.format(self.id, self.username, self.firstname, self.lastname)
@@ -140,3 +149,6 @@ class Student(User):
         return self.coursework
         query = self.coursework.select()
         return db.session.scalars(query).all()
+
+
+

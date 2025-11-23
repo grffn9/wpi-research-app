@@ -17,11 +17,11 @@ class Faculty(User):
     is_verified: sqlo.Mapped[bool] = sqlo.mapped_column(default=False)
     
     positions: sqlo.WriteOnlyMapped['ResearchPosition'] = relationship(back_populates='faculty')
+    #referals: sqlo.WriteOnlyMapped['Application'] = relationship(back_populates='reference')
     __mapper_args__ = {
     'polymorphic_identity': 'Faculty'
     }
     
-
 class ResearchPosition(db.Model):
     __tablename__ = 'research_position'
 
@@ -42,7 +42,7 @@ class ResearchPosition(db.Model):
     faculty_id: Mapped[int] = mapped_column(
         ForeignKey("user.id"), nullable=False
     )
-    faculty: Mapped[Faculty] = relationship(back_populates="positions")
+    faculty: Mapped[User] = relationship(back_populates="positions")
 
     # Many-to-many relationships
     preferred_majors: Mapped[list["Major"]] = relationship(
@@ -59,9 +59,7 @@ class ResearchPosition(db.Model):
     )
 
     # Applications (one-to-many)
-    # applications: Mapped[list["Application"]] = relationship(
-    #     back_populates="position"
-    # )
+    applications: sqlo.WriteOnlyMapped['Application'] = relationship(back_populates= 'position', cascade="all, delete-orphan")
 
     def __repr__(self):
         return '<Position {} - Title: {} - {} - Start: {} - End: {} - Size: {} - GPA: {}>'.format(self.id, self.title, self.description, self.start_date, self.end_date, self.team_size, self.min_gpa)
@@ -70,7 +68,7 @@ class ResearchPosition(db.Model):
         first = db.session.scalars(self.faculty.get_firstname()).first()
         last = db.session.scalars(self.faculty.get_lastname()).first()
         return first + ' ' + last
-
+    
 
 # --- Association Table: ResearchPosition - Majors ---
 position_majors = db.Table(
@@ -99,3 +97,31 @@ position_courses = db.Table(
     db.Column("position_id", db.Integer, db.ForeignKey("research_position.id"), primary_key=True),
     db.Column("course_id", db.Integer, db.ForeignKey("course.id"), primary_key=True)
 )
+
+#an application is connected many-to-one with student and positions
+class Application(db.Model):
+    __tablename__ = 'application'
+    #Primary Key
+    id: sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
+    #title: sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(200))
+    status: sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(10))
+    student_id: sqlo.Mapped[int] = sqlo.mapped_column(sqla.ForeignKey(User.id), index=True, nullable=False)
+    position_id: sqlo.Mapped[int] = sqlo.mapped_column(sqla.ForeignKey(ResearchPosition.id), index=True, nullable=False)
+    #reference_id: sqlo.Mapped[Optional[int]] = sqlo.mapped_column(sqla.ForeignKey(User.id), index=True)
+    statement: sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(1000), nullable=False)
+    
+    #Relationships
+    #student: sqlo.Mapped[User] = sqlo.relationship(back_populates = 'applications')
+    position: sqlo.Mapped[ResearchPosition] = sqlo.relationship(back_populates = 'applications')
+    #reference: sqlo.Mapped[Optional[User]] = sqlo.relationship(back_populates = 'referals')
+
+    #Methods
+    def __repr__(self):
+        return '<Application - {} student: {} - position: {} - reference: {}>'.format(self.id, self.student.get_username(), self.position.title, 
+                                                                                      self.reference.get_username)
+    def needs_reference(self):
+        if self.position.reference_required == True:
+            return True
+        else:
+            return False
+
