@@ -40,12 +40,13 @@ class Grade(db.Model):
 class Major(db.Model):
     id : sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
     name : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(50))
-    department : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(150))
+    department : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(150), nullable=True)
     
     courses : sqlo.WriteOnlyMapped['Course'] = sqlo.relationship(back_populates= 'major')
     students_in_major : sqlo.WriteOnlyMapped['Student'] = sqlo.relationship(
         secondary=students_majors_table,
         back_populates='majors_of_student',
+        passive_deletes=True
     )
     
     def __repr__(self):

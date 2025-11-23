@@ -1,5 +1,6 @@
 # /faculty/profile
 import sys
+from xml.parsers.expat import model
 from flask import render_template, flash, redirect, url_for, abort, request
 from flask import render_template, flash, redirect, url_for
 from flask_login import login_user, current_user, logout_user, login_required
@@ -9,7 +10,7 @@ import sqlalchemy as sqla
 import sqlalchemy as sqla
 from datetime import datetime
 from app.faculty.faculty_models import ResearchPosition
-from app.faculty.faculty_forms import ResearchPositionForm
+from app.faculty.faculty_forms import ResearchPositionForm, AddItemForm
 from app import db
 from app.faculty.faculty_models import ResearchPosition
 from app.faculty import faculty_blueprint as bp_faculty
@@ -157,7 +158,7 @@ def edit_position(position_id):
 @bp_faculty.route('/faculty/index', methods=['GET'])
 @login_required
 def index():
-    all_positions = db.session.scalars(sqla.select(ResearchPosition)).all()
+    all_positions = db.session.scalars(sqla.select(ResearchPosition).where(ResearchPosition.faculty_id == current_user.id)).all()
     # all_posts  = positions.all() 
     return render_template('faculty_index.html', title="Research Portal", positions=all_positions)
 
@@ -166,3 +167,35 @@ def index():
 def viewProfile():
     # empty_form = EmptyForm()
     return render_template('display_profile.html', title = "Display Profile", faculty = current_user)
+
+LIST_MODELS = {
+    "majors" : Major
+}
+
+@bp_faculty.route('/faculty/<list_type>/edit/', methods=['GET', 'POST'])
+@login_required
+def edit_list(list_type):
+    aform = AddItemForm()
+    model = LIST_MODELS.get(list_type)
+
+    #add new item if post = add
+    if aform.validate_on_submit() and 'add' in request.form:
+        new_item = model(name=aform.name.data)
+        db.session.add(new_item)
+        db.session.commit()
+        flash(f"New {list_type} added successfully!")
+        return redirect(url_for("faculty.edit_list", list_type=list_type))
+    
+    #delete item if post = delete
+    if request.method == 'POST' and 'delete' in request.form:
+        item_id = request.form.get('delete')
+        item = model.query.get(item_id)
+        
+        db.session.delete(item)
+        db.session.commit()
+        flash(f"{list_type} deleted successfully!")
+        return redirect(url_for("faculty.edit_list", list_type=list_type))
+
+    items = model.query.all()
+    return render_template("edit_list.html", form=aform, list_type=list_type, items=items)
+

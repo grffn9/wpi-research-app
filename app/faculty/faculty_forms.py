@@ -63,3 +63,15 @@ class ResearchPositionForm(FlaskForm):
     def validate_min_gpa(self, field):
         if field.data < 0 or field.data > 4.0:
             raise ValidationError("GPA must be between 0.0 and 4.0.")
+
+class AddItemForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    submit = SubmitField("Add")
+
+# class UpdatetemForm(FlaskForm):
+#     name = StringField("Name", validators=[DataRequired()])
+#     submit = SubmitField("Add")
+
+# class DeleteItemForm(FlaskForm):
+#     name = StringField("Name", validators=[DataRequired()])
+#     submit = SubmitField("Add")
