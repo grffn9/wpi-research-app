@@ -12,7 +12,6 @@ from flask_login import login_user, current_user, logout_user, login_required
 from app.auth.auth_forms import LoginForm, FacultyRegistrationForm, StudentRegistrationForm
 from app.student.student_forms import get_courses, get_grades, get_instructors
 from app.models.models import Faculty, User
-# from app.faculty.faculty_models import Faculty
 
 
 

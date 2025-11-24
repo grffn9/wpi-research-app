@@ -7,7 +7,7 @@
                 {{position.description}}
             </div>
         <div class="card-footer border-secondary" style="text-align: center;">
-            <a class="btn btn-primary" href=#>See Applicants</a>
+            <a class="btn btn-primary" href="{{ url_for('faculty.view_applicants', position_id=position.id) }}">See Applicants</a>
         </div>
     </div>
 </div>

@@ -1,0 +1,31 @@
+{% extends "faculty_base.html" %}
+
+{% block content %}
+    <h1>Applicants</h1>
+   
+
+
+    <table class = "table table-light table-hover table-bordered border-3 align-middle">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>View</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for  application in applications  %}
+        <tr>
+            <td>{{ application.student.firstname }} {{ application.student.lastname }}</td>
+            <td>{{ application.student.email }}</td>
+            <td>
+                
+
+              
+
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
