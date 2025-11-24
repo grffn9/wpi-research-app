@@ -1,0 +1,66 @@
+{% extends "faculty_base.html" %}
+
+{% block content %}
+<section>
+    <h1     style="text-transform: uppercase;">{{ student.firstname }} {{ student.lastname }}'s Application</h1>
+    <hr>
+
+    <p><strong>Email:</strong> {{ student.email }}</p>
+    <p><strong>WPI ID:</strong> {{ student.wpi_id }}</p>
+    <p><strong>GPA:</strong> {{ student.gpa }}</p>
+
+    <h3>Majors</h3>
+    <ul>
+        {% for major in student.get_majors() %}
+        <li>{{ major.name }} ({{ major.department }})</li>
+        {% else %}
+        <li>No majors listed.</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Research Topics</h3>
+    <ul>
+        {% for topic in student.get_research_topics() %}
+        <li>{{ topic.name }}</li>
+        {% else %}
+        <li>No research topics listed.</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Programming Languages</h3>
+    <ul>
+        {% for lang in student.get_programming_languages() %}
+        <li>{{ lang.name }}</li>
+        {% else %}
+        <li>No programming languages listed.</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Coursework</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="text-align: left;">
+                <th>Course Num</th>
+                <th>Title</th>
+                <th>Instructor</th>
+                <th>Grade</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course_record in student.get_coursework() %}
+            <tr>
+                <td>{{ course_record.course.coursenum }}</td>
+                <td>{{ course_record.course.title }}</td>
+                <td>{{ course_record.instructor.name }}</td>
+                <td>{{ course_record.grade.value }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4">No coursework listed.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+</section>
+{% endblock %}

@@ -21,7 +21,9 @@
             <td>
                 
 
-              
+                <form action="{{ url_for('faculty.view_one_applicant', applicant_id=application.student.id) }}" method="post" class="ms-3">
+                    <input type="submit" value="View" class="btn btn-primary">
+                </form>
 
             </td>
         </tr>
