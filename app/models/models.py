@@ -18,9 +18,6 @@ from app import db
 def load_user(id):
     return db.session.get(User, int(id))
 
-@login.user_loader
-def load_user(id):
-    return db.session.get(User, int(id))
 
 class User(db.Model,UserMixin):
     __tablename__='user'
@@ -107,11 +104,18 @@ class Faculty(User):
     id : sqlo.Mapped[int] = sqlo.mapped_column(sqla.ForeignKey(User.id), primary_key=True)
     is_verified: sqlo.Mapped[bool] = sqlo.mapped_column(default=False)
     
-    positions: sqlo.WriteOnlyMapped['ResearchPosition'] = relationship(back_populates='faculty')
-    #referals: sqlo.WriteOnlyMapped['Application'] = relationship(back_populates='reference')
+    positions: sqlo.Mapped[list["ResearchPosition"]] = sqlo.relationship(
+        back_populates="faculty"
+    )
+    referrals: sqlo.Mapped[list["Application"]] = sqlo.relationship(
+        back_populates="reference", foreign_keys="Application.reference_id"
+    )
+
     __mapper_args__ = {
     'polymorphic_identity': 'Faculty'
     }
+
+
     
 class ResearchPosition(db.Model):
     __tablename__ = 'research_position'
@@ -305,7 +309,7 @@ class StudentCourse(db.Model):
 
 class Student(User):
     __tablename__ = 'student'
-    id : sqlo.Mapped[int] = sqlo.mapped_column(sqla.ForeignKey('user.id'), primary_key=True)
+    id : sqlo.Mapped[int] = sqlo.mapped_column(sqla.ForeignKey(User.id), primary_key=True)
     wpi_id : sqlo.Mapped[int] = sqlo.mapped_column(sqla.Integer, unique=True)
     gpa : sqlo.Mapped[float] = sqlo.mapped_column(sqla.Float, nullable=True)
     
@@ -329,7 +333,7 @@ class Student(User):
     
     coursework : sqlo.Mapped[List['StudentCourse']] = sqlo.relationship(back_populates='student', cascade="all, delete-orphan")
     
-    applications: sqlo.Mapped[List["Application"]] = sqlo.relationship(
+    applications: sqlo.Mapped[List['Application']] = sqlo.relationship(
         back_populates="student",
         cascade="all, delete-orphan"
     )
@@ -378,15 +382,23 @@ class Application(db.Model):
     )
 
     # Relationships
-    student: sqlo.Mapped[Student] = sqlo.relationship(back_populates="applications")
-    position: sqlo.Mapped[ResearchPosition] = sqlo.relationship(back_populates="applications")
-    # reference: sqlo.Mapped[Optional["User"]] = sqlo.relationship()
+    # student: sqlo.Mapped[Student] = sqlo.relationship(back_populates="applications")
+    # position: sqlo.Mapped[ResearchPosition] = sqlo.relationship(back_populates="applications")
+    # reference: sqlo.Mapped[Optional[Faculty]] = sqlo.relationship(back_populates="referals")
 
+    student: sqlo.Mapped["Student"] = sqlo.relationship(
+        back_populates="applications", foreign_keys=[student_id]
+    )
+    position: sqlo.Mapped["ResearchPosition"] = sqlo.relationship(
+        back_populates="applications", foreign_keys=[position_id]
+    )
+    reference: sqlo.Mapped[Optional["Faculty"]] = sqlo.relationship(
+        back_populates="referrals", foreign_keys=[reference_id]
+    )
 
     #Methods
     def __repr__(self):
-        return '<Application - {} student: {} - position: {} - reference: {}>'.format(self.id, self.student.get_username(), self.position.title, 
-                                                                                      self.reference.get_username)
+        return '<Application - {} student: {} - position: {} >'.format(self.id, self.student.get_username(), self.position.title)
     def needs_reference(self):
         if self.position.reference_required == True:
             return True

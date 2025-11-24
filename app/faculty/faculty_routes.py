@@ -169,34 +169,12 @@ def viewProfile():
     # empty_form = EmptyForm()
     return render_template('display_profile.html', title = "Display Profile", faculty = current_user)
 
-LIST_MODELS = {
-    "majors" : Major
-}
 
-@bp_faculty.route('/faculty/<list_type>/edit/', methods=['GET', 'POST'])
+@bp_faculty.route('/position/<int:position_id>/applicants', methods=['GET', 'POST'])
 @login_required
-def edit_list(list_type):
-    aform = AddItemForm()
-    model = LIST_MODELS.get(list_type)
+def view_applicants(position_id):
 
-    #add new item if post = add
-    if aform.validate_on_submit() and 'add' in request.form:
-        new_item = model(name=aform.name.data)
-        db.session.add(new_item)
-        db.session.commit()
-        flash(f"New {list_type} added successfully!")
-        return redirect(url_for("faculty.edit_list", list_type=list_type))
+    all_applications = db.session.scalars(sqla.select(Application).where(Application.position_id == position_id)).all()
+    return render_template('view_applicants.html', applications=all_applications)
+
     
-    #delete item if post = delete
-    if request.method == 'POST' and 'delete' in request.form:
-        item_id = request.form.get('delete')
-        item = model.query.get(item_id)
-        
-        db.session.delete(item)
-        db.session.commit()
-        flash(f"{list_type} deleted successfully!")
-        return redirect(url_for("faculty.edit_list", list_type=list_type))
-
-    items = model.query.all()
-    return render_template("edit_list.html", form=aform, list_type=list_type, items=items)
-
