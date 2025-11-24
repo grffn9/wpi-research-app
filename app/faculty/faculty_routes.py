@@ -177,4 +177,12 @@ def view_applicants(position_id):
     all_applications = db.session.scalars(sqla.select(Application).where(Application.position_id == position_id)).all()
     return render_template('view_applicants.html', applications=all_applications)
 
+
+@bp_faculty.route('/position/<int:applicant_id>/', methods=['GET', 'POST'])
+@login_required
+def view_one_applicant(applicant_id):
+
+    student = db.session.scalars(sqla.select(Student).where(Student.id == applicant_id)).first()
+    return render_template('view_one_applicant.html', student=student)
+
     
