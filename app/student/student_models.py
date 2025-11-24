@@ -42,10 +42,16 @@ class Major(db.Model):
     name : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(50))
     department : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(150))
     
-    courses : sqlo.WriteOnlyMapped['Course'] = sqlo.relationship(back_populates= 'major')
+    courses: sqlo.Mapped[list["Course"]] = db.relationship(
+        "Course",
+        back_populates="major",
+        passive_deletes=True,     
+        cascade="all, delete-orphan"  
+    )    
     students_in_major : sqlo.WriteOnlyMapped['Student'] = sqlo.relationship(
         secondary=students_majors_table,
         back_populates='majors_of_student',
+        passive_deletes=True,
     )
     
     def __repr__(self):
@@ -67,11 +73,18 @@ class Major(db.Model):
 
 class Course(db.Model):
     id : sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
-    majorid : sqlo.Mapped[int] = sqlo.mapped_column(sqla.ForeignKey(Major.id), index = True)
+    majorid: sqlo.Mapped[int] = sqlo.mapped_column(
+        sqla.ForeignKey(Major.id, ondelete="CASCADE"),
+        index=True
+    )
     coursenum : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(10), index = True)
     title : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(150))
     
-    major : sqlo.Mapped[Major] = sqlo.relationship(back_populates= 'courses')
+    major: sqlo.Mapped["Major"] = db.relationship(
+        "Major",
+        back_populates="courses",
+        passive_deletes=True    # match Major side    
+    )
     
     def __repr__(self):
         return '<Course id: {} - coursenum: {} - title: {}>'.format(self.id,self.coursenum, self.title)
@@ -110,9 +123,12 @@ class Student(User):
 
     # Relationships
     majors_of_student : sqlo.Mapped[List['Major']] = sqlo.relationship(
-        secondary=students_majors_table,
-        back_populates='students_in_major',
-    )
+    secondary=students_majors_table,
+    back_populates='students_in_major',
+    passive_deletes=True
+)
+
+
     
     research_topics : sqlo.Mapped[List['ResearchTopic']] = sqlo.relationship(
         secondary=student_research_topics,

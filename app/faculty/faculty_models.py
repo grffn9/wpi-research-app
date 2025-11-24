@@ -20,6 +20,8 @@ class Faculty(User):
     __mapper_args__ = {
     'polymorphic_identity': 'Faculty'
     }
+
+
     
 
 class ResearchPosition(db.Model):

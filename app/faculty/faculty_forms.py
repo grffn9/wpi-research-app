@@ -3,11 +3,14 @@ from wtforms import StringField, SubmitField, IntegerField, FloatField,BooleanFi
 from wtforms.validators import  ValidationError, DataRequired
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField, QuerySelectField
 from datetime import datetime
-from app.faculty.faculty_models import Major, Course
+from app.student.student_models import Major, Course
 from app.auth.auth_models import ResearchTopic, ProgrammingLanguage
 from wtforms.validators import ValidationError, DataRequired
 from app import db
 import sqlalchemy as sqla
+from wtforms.validators import Length
+
+
 
 class ResearchPositionForm(FlaskForm):
     # Basic fields
@@ -55,6 +58,11 @@ class ResearchPositionForm(FlaskForm):
 
     submit = SubmitField("Save Position")
 
+
+
+
+    
+
     # Validators
     def validate_end_date(self, field):
         if self.start_date.data and field.data < self.start_date.data:
@@ -63,3 +71,28 @@ class ResearchPositionForm(FlaskForm):
     def validate_min_gpa(self, field):
         if field.data < 0 or field.data > 4.0:
             raise ValidationError("GPA must be between 0.0 and 4.0.")
+        
+
+class ProgrammingLanguageForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired(), Length(max=100)])
+    submit = SubmitField("Save")
+
+class ResearchTopicForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired(), Length(max=100)])
+    submit = SubmitField("Save")
+        
+class MajorForm(FlaskForm):
+    name = StringField("Major Name", validators=[DataRequired(), Length(max=50)])
+    department = StringField("Department", validators=[DataRequired(), Length(max=150)])
+    submit = SubmitField("Save")
+
+class CourseForm(FlaskForm):
+    majorid = QuerySelectField(
+        "Major",
+        query_factory=lambda: Major.query.all(),
+        get_label="name",
+        allow_blank=False,
+    )
+    coursenum = StringField("Course Number", validators=[DataRequired(), Length(max=10)])
+    title = StringField("Course Title", validators=[DataRequired(), Length(max=150)])
+    submit = SubmitField("Save")
