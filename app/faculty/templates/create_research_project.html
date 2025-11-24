@@ -63,6 +63,11 @@
         <div class="mb-3">
             <label class="form-label">Preferred Majors</label>
             {{ form.preferred_majors() }}
+        <a href="{{ url_for('faculty.edit_list', list_type='majors') }}" class="btn btn-secondary">
+            Edit List
+        </a>
+
+
         </div>
 
         <!-- Research Topics -->

@@ -1,13 +1,13 @@
 from config import Config
-from app.auth.auth_models import User
-from app.faculty.faculty_models import Faculty
-from app.student.student_models import (
+from app.models.models import (
+    Faculty, 
     Major,
     ResearchTopic,
     ProgrammingLanguage,
     Course,
     Instructor,
     Grade,
+    User
 )
 from app import create_app, db, mail
 import sqlalchemy as sqla
