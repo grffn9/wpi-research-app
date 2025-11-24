@@ -5,10 +5,8 @@ from wtforms_sqlalchemy.fields import QuerySelectMultipleField, QuerySelectField
 
 from app import db
 import sqlalchemy as sqla
-# from app.student.student_models import Major, Course, Instructor, Grade
-from app.models.models import Major, Course, Instructor, Grade
+from app.models.models import Major, Course, Instructor, Grade,  ResearchTopic, ProgrammingLanguage
 
-from app.auth.auth_models import ResearchTopic, ProgrammingLanguage
 
 def get_courses():
     return db.session.scalars(sqla.select(Course).order_by(Course.coursenum)).all()

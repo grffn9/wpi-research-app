@@ -1,13 +1,93 @@
+######################################################
+#AUTH
+######################################################
+
+from datetime import datetime, date, timezone
+from typing import Optional
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
+from app import login
+import sqlalchemy as sqla
+import sqlalchemy.orm as sqlo
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import String, Text, Integer, Date, Boolean, ForeignKey, text
+from app import db
+
+
+@login.user_loader
+def load_user(id):
+    return db.session.get(User, int(id))
+
+@login.user_loader
+def load_user(id):
+    return db.session.get(User, int(id))
+
+class User(db.Model,UserMixin):
+    __tablename__='user'
+    id : sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
+    username : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(64), index = True, unique = True, nullable=True)
+    email : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(120), unique=True)
+    firstname : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(120))
+    lastname : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(120))
+    password_hash : sqlo.Mapped[Optional[str]] =sqlo.mapped_column(sqla.String(256))
+    user_type : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(50))
+
+    __mapper_args__ = {
+    'polymorphic_identity': 'User',
+    'polymorphic_on': user_type
+    }
+
+    def __repr__(self):
+        return '<User {} {} - {} - {} - {}>'.format(self.firstname, self.lastname, self.username, self.email, self.user_type)
+
+    def set_password(self,password):
+        self.password_hash=generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+    
+    def get_firstname(self):
+        return self.firstname
+    
+    def get_lastname(self):
+        return self.lastname
+    
+    def get_email(self):
+        return self.email
+
+    def get_username(self):
+        return self.username
+    
+class ResearchTopic(db.Model):
+    id : sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
+    name : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(100), unique=True)
+    
+    def __repr__(self):
+        return self.name
+    
+class ProgrammingLanguage(db.Model):
+    id : sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
+    name : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(100), unique=True)
+
+    def __repr__(self):
+        return self.name
+    
+
+
+
+######################################################
+#Faculty
+######################################################
+
+
+
+
 from datetime import datetime, date, timezone
 from typing import Optional
 
 from app import db
 import sqlalchemy as sqla
 import sqlalchemy.orm as sqlo
-
-from app.auth.auth_models import User, ResearchTopic, ProgrammingLanguage
-# from app.faculty.faculty_models import ResearchPosition
-# from app.student.student_models import Student
 
 
 
@@ -20,8 +100,6 @@ import sqlalchemy.orm as sqlo
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Text, Integer, Date, Boolean, ForeignKey, text
 
-from app.auth.auth_models import User, ResearchTopic, ProgrammingLanguage
-# from app.models.models import Application
 
 class Faculty(User):
     __tablename__='faculty'
@@ -116,12 +194,16 @@ position_courses = db.Table(
 )
 
 
+
+
+######################################################
+#Student
+######################################################
+
 from typing import Optional, List
 from app import db
 import sqlalchemy as sqla
 import sqlalchemy.orm as sqlo
-from app.auth.auth_models import User, ResearchTopic, ProgrammingLanguage
-# from app.models.models import Application
 
 
 # Association Tables
@@ -273,6 +355,9 @@ class Student(User):
         return db.session.scalars(query).all()
 
 
+######################################################
+#Application
+######################################################
 
 #an application is connected many-to-one with student and positions
 class Application(db.Model):

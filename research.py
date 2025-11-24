@@ -1,5 +1,4 @@
 from config import Config
-from app.auth.auth_models import User
 from app.models.models import (
     Faculty, 
     Major,
@@ -8,6 +7,7 @@ from app.models.models import (
     Course,
     Instructor,
     Grade,
+    User
 )
 from app import create_app, db, mail
 import sqlalchemy as sqla

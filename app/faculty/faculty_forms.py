@@ -4,8 +4,7 @@ from wtforms.validators import  ValidationError, DataRequired
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField, QuerySelectField
 from datetime import datetime
 # from app.faculty.faculty_models import Major, Course
-from app.models.models import Major, Course
-from app.auth.auth_models import ResearchTopic, ProgrammingLanguage
+from app.models.models import Major, Course, ResearchTopic, ProgrammingLanguage
 from wtforms.validators import ValidationError, DataRequired
 from app import db
 import sqlalchemy as sqla
