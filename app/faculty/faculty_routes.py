@@ -390,3 +390,10 @@ def delete_language(language_id):
     db.session.commit()
     flash('Programming language deleted.', 'success')
     return redirect(url_for('faculty.list_languages'))
+
+@bp_faculty.route('/faculty/admin')
+@login_required
+def admin_home():
+    if current_user.user_type != "Faculty":
+        abort(403)
+    return render_template('faculty_admin.html')
