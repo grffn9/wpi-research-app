@@ -93,7 +93,7 @@ def create_position():
 def edit_position(position_id):
 
     # Must be a faculty member
-    if current_user.user_type != "Faculty":
+    if not current_user.user_type == 'Faculty':
         abort(403)
 
 
@@ -151,7 +151,7 @@ def edit_position(position_id):
         db.session.commit()
 
         flash("Position updated!", "success")
-        return redirect(url_for("faculty.viewProfile"))
+        return redirect(url_for("faculty.faculty_index"))
 
     return render_template("faculty/edit_position.html", form=form, position=position)
 

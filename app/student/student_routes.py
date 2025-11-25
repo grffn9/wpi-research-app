@@ -141,4 +141,15 @@ def apply(position_id):
 
     return render_template('apply.html', title='Apply', form=form, position=position)
 
-
+@bp_student.route('/position/view/<int:position_id>', methods=['GET'])
+@login_required
+def view_pos(position_id):
+    if current_user.user_type != 'Student':
+        flash('Access denied. You must be a student to view this position.')
+        return redirect(url_for('student.index'))
+    position = db.session.scalars(
+        sqla.select(ResearchPosition).where(ResearchPosition.id == position_id)).first()
+    if not position:
+        flash('Position not found.')
+        return redirect(url_for('student.index'))
+    return render_template('view_pos_details.html', title='View Position', position=position)

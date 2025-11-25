@@ -3,14 +3,14 @@
 <div class="col" id="position-{{position.id}}">
     <div class="card border-secondary h-100"> 
         <h4 class="card-header border-secondary" style="text-align: center;">{{position.title}}</h4>
-            <div class="card-body" style="max-height: 7rem; overflow: auto; overflow-wrap: break-word; background-color: #dbe3ec;">
+            <div class="card-body" style="max-height: 13rem; overflow: auto; overflow-wrap: break-word; background-color: #dbe3ec;">
                 {{position.description}}
             </div>
             <div class="card-body" style="max-height: 3rem; overflow: hidden; overflow-wrap: break-word; background-color: #ffffff;">
                 <h6>Posted by: {{position.faculty.get_firstname()}} {{position.faculty.get_lastname()}}</h6>
             </div>
     <div class="card-footer border-secondary" style="text-align: center;">
-        <a class="btn btn-primary" href=#>See More Details</a>
+        <a class="btn btn-primary" href="{{ url_for('student.view_pos', position_id=position.id)}}">See More Details</a>
         {% if position.id in applied_ids %}
         <button class="btn btn-secondary" disabled>Applied</button>
         {% else %}
