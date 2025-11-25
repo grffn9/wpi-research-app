@@ -10,7 +10,7 @@
                 <h6>Posted by: {{position.faculty.get_firstname()}} {{position.faculty.get_lastname()}}</h6>
             </div>
     <div class="card-footer border-secondary" style="text-align: center;">
-        <a class="btn btn-primary" href=#>See More Details</a>
+        <a class="btn btn-primary" href="{{ url_for('student.view_pos', position_id=position.id)}}">See More Details</a>
         {% if position.id in applied_ids %}
         <button class="btn btn-secondary" disabled>Applied</button>
         {% else %}
