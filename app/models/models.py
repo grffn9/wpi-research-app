@@ -1,3 +1,84 @@
+######################################################
+#AUTH
+######################################################
+
+from datetime import datetime, date, timezone
+from typing import Optional
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
+from app import login
+import sqlalchemy as sqla
+import sqlalchemy.orm as sqlo
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import String, Text, Integer, Date, Boolean, ForeignKey, text
+from app import db
+
+
+@login.user_loader
+def load_user(id):
+    return db.session.get(User, int(id))
+
+
+class User(db.Model,UserMixin):
+    __tablename__='user'
+    id : sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
+    username : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(64), index = True, unique = True, nullable=True)
+    email : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(120), unique=True)
+    firstname : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(120))
+    lastname : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(120))
+    password_hash : sqlo.Mapped[Optional[str]] =sqlo.mapped_column(sqla.String(256))
+    user_type : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(50))
+
+    __mapper_args__ = {
+    'polymorphic_identity': 'User',
+    'polymorphic_on': user_type
+    }
+
+    def __repr__(self):
+        return '<User {} {} - {} - {} - {}>'.format(self.firstname, self.lastname, self.username, self.email, self.user_type)
+
+    def set_password(self,password):
+        self.password_hash=generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+    
+    def get_firstname(self):
+        return self.firstname
+    
+    def get_lastname(self):
+        return self.lastname
+    
+    def get_email(self):
+        return self.email
+
+    def get_username(self):
+        return self.username
+    
+class ResearchTopic(db.Model):
+    id : sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
+    name : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(100), unique=True)
+    
+    def __repr__(self):
+        return self.name
+    
+class ProgrammingLanguage(db.Model):
+    id : sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
+    name : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(100), unique=True)
+
+    def __repr__(self):
+        return self.name
+    
+
+
+
+######################################################
+#Faculty
+######################################################
+
+
+
+
 from datetime import datetime, date, timezone
 from typing import Optional
 
@@ -16,8 +97,6 @@ import sqlalchemy.orm as sqlo
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Text, Integer, Date, Boolean, ForeignKey, text
 
-from app.auth.auth_models import User, ResearchTopic, ProgrammingLanguage
-# from app.models.models import Application
 
 class Faculty(User):
     __tablename__='faculty'
@@ -25,11 +104,18 @@ class Faculty(User):
     id : sqlo.Mapped[int] = sqlo.mapped_column(sqla.ForeignKey(User.id), primary_key=True)
     is_verified: sqlo.Mapped[bool] = sqlo.mapped_column(default=False)
     
-    positions: sqlo.WriteOnlyMapped['ResearchPosition'] = relationship(back_populates='faculty')
-    #referals: sqlo.WriteOnlyMapped['Application'] = relationship(back_populates='reference')
+    positions: sqlo.Mapped[list["ResearchPosition"]] = sqlo.relationship(
+        back_populates="faculty"
+    )
+    referrals: sqlo.Mapped[list["Application"]] = sqlo.relationship(
+        back_populates="reference", foreign_keys="Application.reference_id"
+    )
+
     __mapper_args__ = {
     'polymorphic_identity': 'Faculty'
     }
+
+
     
 class ResearchPosition(db.Model):
     __tablename__ = 'research_position'
@@ -78,9 +164,7 @@ class ResearchPosition(db.Model):
         return '<Position {} - Title: {} - {} - Start: {} - End: {} - Size: {} - GPA: {}>'.format(self.id, self.title, self.description, self.start_date, self.end_date, self.team_size, self.min_gpa)
 
     def get_faculty_name(self):
-        first = db.session.scalars(self.faculty.get_firstname()).first()
-        last = db.session.scalars(self.faculty.get_lastname()).first()
-        return first + ' ' + last
+        return self.faculty.get_firstname() + ' ' + self.faculty.get_lastname()
     
 
 # --- Association Table: ResearchPosition - Majors ---
@@ -112,12 +196,16 @@ position_courses = db.Table(
 )
 
 
+
+
+######################################################
+#Student
+######################################################
+
 from typing import Optional, List
 from app import db
 import sqlalchemy as sqla
 import sqlalchemy.orm as sqlo
-#from app.auth.auth_models import User, ResearchTopic, ProgrammingLanguage
-# from app.models.models import Application
 
 
 # Association Tables
@@ -219,7 +307,7 @@ class StudentCourse(db.Model):
 
 class Student(User):
     __tablename__ = 'student'
-    id : sqlo.Mapped[int] = sqlo.mapped_column(sqla.ForeignKey('user.id'), primary_key=True)
+    id : sqlo.Mapped[int] = sqlo.mapped_column(sqla.ForeignKey(User.id), primary_key=True)
     wpi_id : sqlo.Mapped[int] = sqlo.mapped_column(sqla.Integer, unique=True)
     gpa : sqlo.Mapped[float] = sqlo.mapped_column(sqla.Float, nullable=True)
     
@@ -243,7 +331,7 @@ class Student(User):
     
     coursework : sqlo.Mapped[List['StudentCourse']] = sqlo.relationship(back_populates='student', cascade="all, delete-orphan")
     
-    applications: sqlo.Mapped[List["Application"]] = sqlo.relationship(
+    applications: sqlo.Mapped[List['Application']] = sqlo.relationship(
         back_populates="student",
         cascade="all, delete-orphan"
     )
@@ -269,6 +357,9 @@ class Student(User):
         return db.session.scalars(query).all()
 
 
+######################################################
+#Application
+######################################################
 
 #an application is connected many-to-one with student and positions
 class Application(db.Model):
@@ -289,15 +380,23 @@ class Application(db.Model):
     )
 
     # Relationships
-    student: sqlo.Mapped[Student] = sqlo.relationship(back_populates="applications")
-    position: sqlo.Mapped[ResearchPosition] = sqlo.relationship(back_populates="applications")
-    # reference: sqlo.Mapped[Optional["User"]] = sqlo.relationship()
+    # student: sqlo.Mapped[Student] = sqlo.relationship(back_populates="applications")
+    # position: sqlo.Mapped[ResearchPosition] = sqlo.relationship(back_populates="applications")
+    # reference: sqlo.Mapped[Optional[Faculty]] = sqlo.relationship(back_populates="referals")
 
+    student: sqlo.Mapped["Student"] = sqlo.relationship(
+        back_populates="applications", foreign_keys=[student_id]
+    )
+    position: sqlo.Mapped["ResearchPosition"] = sqlo.relationship(
+        back_populates="applications", foreign_keys=[position_id]
+    )
+    reference: sqlo.Mapped[Optional["Faculty"]] = sqlo.relationship(
+        back_populates="referrals", foreign_keys=[reference_id]
+    )
 
     #Methods
     def __repr__(self):
-        return '<Application - {} student: {} - position: {} - reference: {}>'.format(self.id, self.student.get_username(), self.position.title, 
-                                                                                      self.reference.get_username)
+        return '<Application - {} student: {} - position: {} >'.format(self.id, self.student.get_username(), self.position.title)
     def needs_reference(self):
         if self.position.reference_required == True:
             return True
