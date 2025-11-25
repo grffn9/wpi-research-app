@@ -1,19 +1,21 @@
 # /faculty/profile
 import sys
+from xml.parsers.expat import model
 from flask import render_template, flash, redirect, url_for, abort, request
 from flask import render_template, flash, redirect, url_for
 from flask_login import login_user, current_user, logout_user, login_required
 
 import sqlalchemy as sqla
-
 import sqlalchemy as sqla
 from datetime import datetime
-from app.faculty.faculty_models import ResearchPosition
-from app.faculty.faculty_forms import ResearchPositionForm
+from app.faculty.faculty_forms import ResearchPositionForm, AddItemForm
 from app import db
-from app.faculty.faculty_models import ResearchPosition
 from app.faculty import faculty_blueprint as bp_faculty
-from app.faculty.faculty_models import (ResearchPosition, Major, ResearchTopic, ProgrammingLanguage, Course)
+# from app.faculty.faculty_models import Major, ResearchTopic, ProgrammingLanguage, Course
+from app.models.models import Major, ResearchTopic, ProgrammingLanguage, Course
+
+from app.models import Student, ResearchPosition, Application
+
 
 @bp_faculty.route('/create_position', methods=['GET', 'POST'])
 @login_required
@@ -166,3 +168,21 @@ def index():
 def viewProfile():
     # empty_form = EmptyForm()
     return render_template('display_profile.html', title = "Display Profile", faculty = current_user)
+
+
+@bp_faculty.route('/position/<int:position_id>/applicants', methods=['GET', 'POST'])
+@login_required
+def view_applicants(position_id):
+
+    all_applications = db.session.scalars(sqla.select(Application).where(Application.position_id == position_id)).all()
+    return render_template('view_applicants.html', applications=all_applications)
+
+
+@bp_faculty.route('/position/<int:applicant_id>/', methods=['GET', 'POST'])
+@login_required
+def view_one_applicant(applicant_id):
+
+    student = db.session.scalars(sqla.select(Student).where(Student.id == applicant_id)).first()
+    return render_template('view_one_applicant.html', student=student)
+
+    

@@ -11,7 +11,11 @@
             </div>
     <div class="card-footer border-secondary" style="text-align: center;">
         <a class="btn btn-primary" href=#>See More Details</a>
-        <a class="btn btn-primary" href=#>Apply</a>
+        {% if position.id in applied_ids %}
+        <button class="btn btn-secondary" disabled>Applied</button>
+        {% else %}
+        <a class="btn btn-primary" href="{{ url_for('student.apply', position_id=position.id) }}">Apply</a>
+        {% endif %}
     </div>
     </div>
 </div>
