@@ -2,42 +2,83 @@
 
 {% block content %}
 <section>
-    <h1     style="text-transform: uppercase;">{{ student.firstname }} {{ student.lastname }}'s Application</h1>
+    <h1 style="text-transform: uppercase;">{{ student.firstname }} {{ student.lastname }}'s Application</h1>
     <hr>
 
     <p><strong>Email:</strong> {{ student.email }}</p>
     <p><strong>WPI ID:</strong> {{ student.wpi_id }}</p>
     <p><strong>GPA:</strong> {{ student.gpa }}</p>
 
-    <h3>Majors</h3>
-    <ul>
+
+<table class = "table table-light table-hover table-bordered border-3 align-middle">
+    <thead>
+        <tr>
+            <th>Majors</th>
+        </tr>
+    </thead>
+    <tbody>
         {% for major in student.get_majors() %}
-        <li>{{ major.name }} ({{ major.department }})</li>
+        <tr>
+            <td>{{ major.name }} ({{ major.department }})</td>
+        </tr>
         {% else %}
-        <li>No majors listed.</li>
+        <tr>
+            <td>No majors listed.</td>
+        </tr>
         {% endfor %}
-    </ul>
+    </tbody>
+</table>
 
-    <h3>Research Topics</h3>
-    <ul>
+
+
+
+
+
+<table class = "table table-light table-hover table-bordered border-3 align-middle">
+    <thead>
+        <tr>
+            <th>Research Topics</th>
+        </tr>
+    </thead>
+    <tbody>
         {% for topic in student.get_research_topics() %}
-        <li>{{ topic.name }}</li>
+        <tr>
+            <td>{{ topic.name }}</td>
+        </tr>
         {% else %}
-        <li>No research topics listed.</li>
+        <tr>
+            <td>No research topics listed.</td>
+        </tr>
         {% endfor %}
-    </ul>
+    </tbody>
+</table>
 
-    <h3>Programming Languages</h3>
-    <ul>
+
+
+
+<table class = "table table-light table-hover table-bordered border-3 align-middle">
+    <thead>
+        <tr>
+            <th>Programming Languages</th>
+        </tr>
+    </thead>
+    <tbody>
         {% for lang in student.get_programming_languages() %}
-        <li>{{ lang.name }}</li>
+        <tr>
+            <td>{{ lang.name }}</td>
+        </tr>
         {% else %}
-        <li>No programming languages listed.</li>
+        <tr>
+            <td>No programming languages listed.</td>
+        </tr>
         {% endfor %}
-    </ul>
+    </tbody>
+</table>
 
+
+   
     <h3>Coursework</h3>
-    <table style="width: 100%; border-collapse: collapse;">
+    <table class = "table table-light table-hover table-bordered border-3 align-middle">
         <thead>
             <tr style="text-align: left;">
                 <th>Course Num</th>
