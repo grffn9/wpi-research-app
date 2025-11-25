@@ -8,13 +8,11 @@ from flask_login import login_user, current_user, logout_user, login_required
 import sqlalchemy as sqla
 import sqlalchemy as sqla
 from datetime import datetime
-from app.faculty.faculty_models import ResearchPosition
-from app.faculty.faculty_forms import ResearchPositionForm
+from app.faculty.faculty_forms import ResearchPositionForm,MajorForm, ResearchTopicForm, ProgrammingLanguageForm, CourseForm
 from app import db
 from app.faculty import faculty_blueprint as bp_faculty
 # from app.faculty.faculty_models import Major, ResearchTopic, ProgrammingLanguage, Course
-from app.models.models import Major, ResearchTopic, ProgrammingLanguage, Course
-
+from app.models.models import Major, ResearchTopic, ProgrammingLanguage, Course, Faculty
 from app.models import Student, ResearchPosition, Application
 
 
@@ -171,7 +169,7 @@ def viewProfile():
     # empty_form = EmptyForm()
     return render_template('display_profile.html', title = "Display Profile", faculty = current_user)
 
-
+# ------------------ Applicants ------------------
 @bp_faculty.route('/position/<int:position_id>/applicants', methods=['GET', 'POST'])
 @login_required
 def view_applicants(position_id):
@@ -185,27 +183,38 @@ def view_applicants(position_id):
 def view_one_applicant(applicant_id):
 
     student = db.session.scalars(sqla.select(Student).where(Student.id == applicant_id)).first()
-    return render_template('view_one_applicant.html', student=student)
+    application = db.session.scalars(sqla.select(Application).where(Application.student_id == applicant_id)).first()
+    return render_template('view_one_applicant.html', student=student, application=application)
 
-    
-
-
-@bp_faculty.route('/position/<int:position_id>/applicants', methods=['GET', 'POST'])
+@bp_faculty.route('/application/<int:app_id>/update', methods=['POST'])
 @login_required
-def view_applicants(position_id):
+def update_application_status(app_id):
+    app = Application.query.get_or_404(app_id)
+    action = request.form.get("action")
 
-    all_applications = db.session.scalars(sqla.select(Application).where(Application.position_id == position_id)).all()
-    return render_template('view_applicants.html', applications=all_applications)
+    position = app.position  # The research position they applied to
 
+    if action == "accept":
+        # ----- Enforce Max Team Size -----
+        accepted_count = Application.query.filter_by(
+            position_id=position.id,
+            status="Accepted"
+        ).count()
 
-@bp_faculty.route('/position/<int:applicant_id>/', methods=['GET', 'POST'])
-@login_required
-def view_one_applicant(applicant_id):
+        if accepted_count >= position.team_size:
+            flash("You cannot accept this student — team size limit reached.", "warning")
+            return redirect(url_for('faculty.view_one_applicant', applicant_id=app.student_id))
 
-    student = db.session.scalars(sqla.select(Student).where(Student.id == applicant_id)).first()
-    return render_template('view_one_applicant.html', student=student)
+        app.status = "Accepted"
+        flash("Application accepted")
 
-    
+    elif action == "reject":
+        app.status = "Rejected"
+        flash("Application rejected")
+
+    db.session.commit()
+    return redirect(url_for('faculty.view_applicants', position_id=app.id))
+
 
 
 # ------------------ Majors ------------------

@@ -247,7 +247,7 @@ class Major(db.Model):
     name : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(50))
     department : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(150), nullable=True)
     
-    courses : sqlo.WriteOnlyMapped['Course'] = sqlo.relationship(back_populates= 'major')
+    courses : sqlo.WriteOnlyMapped['Course'] = sqlo.relationship(back_populates= 'major',passive_deletes=True)
     
     students_in_major : sqlo.WriteOnlyMapped['Student'] = sqlo.relationship(
         secondary=students_majors_table,
@@ -278,7 +278,7 @@ class Course(db.Model):
     coursenum : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(10), index = True)
     title : sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(150))
     
-    major : sqlo.Mapped[Major] = sqlo.relationship(back_populates= 'courses')
+    major : sqlo.Mapped[Major] = sqlo.relationship(back_populates= 'courses',passive_deletes=True)
     
     def __repr__(self):
         return '<Course id: {} - coursenum: {} - title: {}>'.format(self.id,self.coursenum, self.title)
