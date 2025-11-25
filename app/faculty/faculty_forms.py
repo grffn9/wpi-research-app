@@ -3,11 +3,14 @@ from wtforms import StringField, SubmitField, IntegerField, FloatField,BooleanFi
 from wtforms.validators import  ValidationError, DataRequired
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField, QuerySelectField
 from datetime import datetime
-# from app.faculty.faculty_models import Major, Course
-from app.models.models import Major, Course, ResearchTopic, ProgrammingLanguage
+from app.faculty.faculty_models import Major, Course
+from app.auth.auth_models import ResearchTopic, ProgrammingLanguage
 from wtforms.validators import ValidationError, DataRequired
 from app import db
 import sqlalchemy as sqla
+from wtforms.validators import Length
+
+
 
 class ResearchPositionForm(FlaskForm):
     # Basic fields
@@ -55,6 +58,11 @@ class ResearchPositionForm(FlaskForm):
 
     submit = SubmitField("Save Position")
 
+
+
+
+    
+
     # Validators
     def validate_end_date(self, field):
         if self.start_date.data and field.data < self.start_date.data:
@@ -63,15 +71,3 @@ class ResearchPositionForm(FlaskForm):
     def validate_min_gpa(self, field):
         if field.data < 0 or field.data > 4.0:
             raise ValidationError("GPA must be between 0.0 and 4.0.")
-
-class AddItemForm(FlaskForm):
-    name = StringField("Name", validators=[DataRequired()])
-    submit = SubmitField("Add")
-
-# class UpdatetemForm(FlaskForm):
-#     name = StringField("Name", validators=[DataRequired()])
-#     submit = SubmitField("Add")
-
-# class DeleteItemForm(FlaskForm):
-#     name = StringField("Name", validators=[DataRequired()])
-#     submit = SubmitField("Add")

@@ -8,7 +8,8 @@ from flask_login import login_user, current_user, logout_user, login_required
 import sqlalchemy as sqla
 import sqlalchemy as sqla
 from datetime import datetime
-from app.faculty.faculty_forms import ResearchPositionForm, AddItemForm
+from app.faculty.faculty_models import ResearchPosition
+from app.faculty.faculty_forms import ResearchPositionForm
 from app import db
 from app.faculty import faculty_blueprint as bp_faculty
 # from app.faculty.faculty_models import Major, ResearchTopic, ProgrammingLanguage, Course
@@ -94,8 +95,9 @@ def create_position():
 def edit_position(position_id):
 
     # Must be a faculty member
-    if not current_user.is_faculty:
+    if current_user.user_type != "Faculty":
         abort(403)
+
 
     position = ResearchPosition.query.get_or_404(position_id)
 
@@ -186,3 +188,247 @@ def view_one_applicant(applicant_id):
     return render_template('view_one_applicant.html', student=student)
 
     
+
+
+@bp_faculty.route('/position/<int:position_id>/applicants', methods=['GET', 'POST'])
+@login_required
+def view_applicants(position_id):
+
+    all_applications = db.session.scalars(sqla.select(Application).where(Application.position_id == position_id)).all()
+    return render_template('view_applicants.html', applications=all_applications)
+
+
+@bp_faculty.route('/position/<int:applicant_id>/', methods=['GET', 'POST'])
+@login_required
+def view_one_applicant(applicant_id):
+
+    student = db.session.scalars(sqla.select(Student).where(Student.id == applicant_id)).first()
+    return render_template('view_one_applicant.html', student=student)
+
+    
+
+
+# ------------------ Majors ------------------
+@bp_faculty.route('/faculty/majors')
+@login_required
+def list_majors():
+    if current_user.user_type != "Faculty":
+        abort(403)
+    majors = db.session.scalars(sqla.select(Major).order_by(Major.name)).all()
+    return render_template('majors_list.html', majors=majors)
+
+
+@bp_faculty.route('/faculty/majors/create', methods=['GET','POST'])
+@login_required
+def create_major():
+    if current_user.user_type != "Faculty":
+        abort(403)
+    form = MajorForm()
+    if form.validate_on_submit():
+        major = Major(
+            name=form.name.data,
+            department=form.department.data
+        )
+        db.session.add(major)
+        db.session.commit()
+        flash('Major created.', 'success')
+        return redirect(url_for('faculty.list_majors'))
+    return render_template('majors_form.html', form=form, action='Create')
+
+
+@bp_faculty.route('/faculty/majors/<int:major_id>/edit', methods=['GET','POST'])
+@login_required
+def edit_major(major_id):
+    if current_user.user_type != "Faculty":
+        abort(403)
+    major = db.session.get(Major, major_id) or abort(404)
+    form = MajorForm(obj=major)
+    if form.validate_on_submit():
+        major.name = form.name.data
+        major.department = form.department.data
+        db.session.commit()
+        flash('Major updated.', 'success')
+        return redirect(url_for('faculty.list_majors'))
+    return render_template('majors_form.html', form=form, action='Edit')
+
+
+@bp_faculty.route('/faculty/majors/<int:major_id>/delete', methods=['POST'])
+@login_required
+def delete_major(major_id):
+    if current_user.user_type != "Faculty":
+        abort(403)
+    major = db.session.get(Major, major_id) or abort(404)
+    db.session.delete(major)
+    db.session.commit()
+    flash('Major deleted.', 'success')
+    return redirect(url_for('faculty.list_majors'))
+
+
+
+# ------------------ Research Topics ------------------
+@bp_faculty.route('/faculty/topics')
+@login_required
+def list_topics():
+    if current_user.user_type != "Faculty":
+        abort(403)
+    topics = db.session.scalars(
+        sqla.select(ResearchTopic).order_by(ResearchTopic.name)
+    ).all()
+    return render_template('topics_list.html', topics=topics)
+
+
+@bp_faculty.route('/faculty/topics/create', methods=['GET','POST'])
+@login_required
+def create_topic():
+    if current_user.user_type != "Faculty":
+        abort(403)
+    form = ResearchTopicForm()
+    if form.validate_on_submit():
+        topic = ResearchTopic(
+            name=form.name.data,
+        )
+        db.session.add(topic)
+        db.session.commit()
+        flash('Research topic created.', 'success')
+        return redirect(url_for('faculty.list_topics'))
+    return render_template('topics_form.html', form=form, action='Create')
+
+
+@bp_faculty.route('/faculty/topics/<int:topic_id>/edit', methods=['GET','POST'])
+@login_required
+def edit_topic(topic_id):
+    if current_user.user_type != "Faculty":
+        abort(403)
+    topic = db.session.get(ResearchTopic, topic_id) or abort(404)
+    form = ResearchTopicForm(obj=topic)
+    if form.validate_on_submit():
+        topic.name = form.name.data
+        db.session.commit()
+        flash('Research topic updated.', 'success')
+        return redirect(url_for('faculty.list_topics'))
+    return render_template('topics_form.html', form=form, action='Edit')
+
+
+@bp_faculty.route('/faculty/topics/<int:topic_id>/delete', methods=['POST'])
+@login_required
+def delete_topic(topic_id):
+    if current_user.user_type != "Faculty":
+        abort(403)
+    topic = db.session.get(ResearchTopic, topic_id) or abort(404)
+    db.session.delete(topic)
+    db.session.commit()
+    flash('Research topic deleted.', 'success')
+    return redirect(url_for('faculty.list_topics'))
+
+# ------------------ Courses ------------------
+@bp_faculty.route('/faculty/courses')
+@login_required
+def list_courses():
+    if current_user.user_type != "Faculty":
+        abort(403)
+    Courses = db.session.scalars(sqla.select(Course).order_by(Course.coursenum)).all()
+    return render_template('courses_list.html', courses=Courses)
+
+
+@bp_faculty.route('/faculty/courses/create', methods=['GET','POST'])
+@login_required
+def create_course():
+    if current_user.user_type != "Faculty":
+        abort(403)
+    form = CourseForm()
+    if form.validate_on_submit():
+        course = Course(coursenum=form.coursenum.data, title=form.title.data, major=form.major.data)
+        db.session.add(course)
+        db.session.commit()
+        flash('Course created.', 'success')
+        return redirect(url_for('faculty.list_courses'))
+    return render_template('courses_form.html', form=form, action='Create')
+
+@bp_faculty.route('/faculty/courses/<int:course_id>/edit', methods=['GET','POST'])
+@login_required
+def edit_course(course_id):
+    if current_user.user_type != "Faculty":
+        abort(403)
+    course = db.session.get(Course, course_id) or abort(404)
+    form = CourseForm(obj=course)
+    if form.validate_on_submit():
+        course.coursenum = form.coursenum.data
+        course.title = form.title.data
+        course.major = form.major.data
+        db.session.commit()
+        flash('Course updated.', 'success')
+        return redirect(url_for('faculty.list_courses'))
+    return render_template('courses_form.html', form=form, action='Edit')
+
+@bp_faculty.route('/faculty/courses/<int:course_id>/delete', methods=['POST'])
+@login_required
+def delete_course(course_id):
+    if current_user.user_type != "Faculty":
+        abort(403)
+    course = db.session.get(Course, course_id) or abort(404)
+    db.session.delete(course)
+    db.session.commit()
+    flash('Course deleted.', 'success')
+    return redirect(url_for('faculty.list_courses'))
+
+#------------------ Languages ------------------
+@bp_faculty.route('/faculty/languages')
+@login_required
+def list_languages():
+    if current_user.user_type != "Faculty":
+        abort(403)
+    languages = db.session.scalars(
+        sqla.select(ProgrammingLanguage).order_by(ProgrammingLanguage.name)
+    ).all()
+    return render_template('languages_list.html', languages=languages)
+
+
+@bp_faculty.route('/faculty/languages/create', methods=['GET','POST'])
+@login_required
+def create_language():
+    if current_user.user_type != "Faculty":
+        abort(403)
+    form = ProgrammingLanguageForm()
+    if form.validate_on_submit():
+        language = ProgrammingLanguage(
+            name=form.name.data,        
+        )
+        db.session.add(language)
+        db.session.commit()
+        flash('Programming language created.', 'success')
+        return redirect(url_for('faculty.list_languages'))
+    return render_template('languages_form.html', form=form, action='Create')
+
+
+@bp_faculty.route('/faculty/languages/<int:language_id>/edit', methods=['GET','POST'])
+@login_required
+def edit_language(language_id):
+    if current_user.user_type != "Faculty":
+        abort(403)
+    language = db.session.get(ProgrammingLanguage, language_id) or abort(404)
+    form = ProgrammingLanguageForm(obj=language)
+    if form.validate_on_submit():
+        language.name = form.name.data
+        db.session.commit()
+        flash('Programming language updated.', 'success')
+        return redirect(url_for('faculty.list_languages'))
+    return render_template('languages_form.html', form=form, action='Edit')
+
+
+@bp_faculty.route('/faculty/languages/<int:language_id>/delete', methods=['POST'])
+@login_required
+def delete_language(language_id):
+    if current_user.user_type != "Faculty":
+        abort(403)
+    language = db.session.get(ProgrammingLanguage, language_id) or abort(404)
+    db.session.delete(language)
+    db.session.commit()
+    flash('Programming language deleted.', 'success')
+    return redirect(url_for('faculty.list_languages'))
+
+@bp_faculty.route('/faculty/admin')
+@login_required
+def admin_home():
+    if current_user.user_type != "Faculty":
+        abort(403)
+    return render_template('faculty_admin.html')
