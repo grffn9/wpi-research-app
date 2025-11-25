@@ -1,0 +1,51 @@
+{% extends "student_base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Apply for {{ position.title }}</h1>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Position Details</h5>
+            <p class="card-text">{{ position.description }}</p>
+            <p><strong>Start Date:</strong> {{ position.start_date }}</p>
+            <p><strong>End Date:</strong> {{ position.end_date }}</p>
+            <p><strong>Team Size:</strong> {{ position.team_size }}</p>
+            <p><strong>Min GPA:</strong> {{ position.min_gpa }}</p>
+            <p><strong>Faculty:</strong> {{ position.faculty.get_firstname() }} {{ position.faculty.get_lastname() }}</p>
+        </div>
+    </div>
+
+    <form action="" method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        
+        <div class="mb-3">
+            {{ form.statement.label(class="form-label") }}
+            {{ form.statement(class="form-control", rows=5) }}
+            {% for error in form.statement.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+
+        {% if position.reference_required %}
+        <div class="mb-3">
+            {{ form.reference.label(class="form-label", text="Faculty Reference") }} <span style="color: red;">* Required</span>
+            {{ form.reference(class="form-control") }}
+            {% for error in form.reference.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="mb-3">
+            {{ form.reference.label(class="form-label") }}
+            {{ form.reference(class="form-control") }}
+            {% for error in form.reference.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {{ form.submit(class="btn btn-primary") }}
+    </form>
+</div>
+{% endblock %}

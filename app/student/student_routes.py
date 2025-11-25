@@ -5,11 +5,8 @@ import sqlalchemy as sqla
 
 from app import db
 
-from app.student.student_forms import EditProfileForm, get_courses, get_grades, get_instructors
-from app.models.models import StudentCourse, ResearchPosition
-
-# from app.models.models import Student, ResearchPosition, Application
-
+from app.student.student_forms import EditProfileForm, get_courses, get_grades, get_instructors, ApplicationForm
+from app.models.models import StudentCourse, ResearchPosition, Application
 
 from app.student import student_blueprint as bp_student
 
@@ -18,7 +15,15 @@ from app.student import student_blueprint as bp_student
 @login_required
 def index():
     all_positions = db.session.scalars(sqla.select(ResearchPosition)).all()
-    return render_template('student_index.html', title="Research Application Portal", positions=all_positions)
+    
+    applied_ids = []
+    if current_user.user_type == 'Student':
+        applications = db.session.scalars(
+            sqla.select(Application).where(Application.student_id == current_user.id)
+        ).all()
+        applied_ids = [app.position_id for app in applications]
+
+    return render_template('student_index.html', title="Research Application Portal", positions=all_positions, applied_ids=applied_ids)
 
 @bp_student.route('/profile', methods=['GET'])
 @login_required
@@ -87,5 +92,53 @@ def edit_profile():
         grade_choices=[(g.id, g.value) for g in get_grades()],
         instructor_choices=[(i.id, i.name) for i in get_instructors()]
     )
+
+@bp_student.route('/apply/<int:position_id>', methods=['GET', 'POST'])
+@login_required
+def apply(position_id):
+    if current_user.user_type != 'Student':
+        flash('Access denied. You must be a student to apply.')
+        return redirect(url_for('student.index'))
+
+    position = db.session.get(ResearchPosition, position_id)
+    if not position:
+        flash('Position not found.')
+        return redirect(url_for('student.index'))
+
+    # Check if already applied
+    existing_application = db.session.scalars(
+        sqla.select(Application).where(
+            Application.student_id == current_user.id,
+            Application.position_id == position.id
+        )
+    ).first()
+
+    if existing_application:
+        flash('You have already applied to this position.')
+        return redirect(url_for('student.index'))
+
+    form = ApplicationForm()
+    
+    if form.validate_on_submit():
+        if position.reference_required and not form.reference.data:
+            flash('This position requires a faculty reference.')
+            return render_template('apply.html', title='Apply', form=form, position=position)
+
+        application = Application(
+            student_id=current_user.id,
+            position_id=position.id,
+            statement=form.statement.data,
+            status='pending'
+        )
+        
+        if form.reference.data:
+            application.reference_id = form.reference.data.id
+            
+        db.session.add(application)
+        db.session.commit()
+        flash('Application submitted successfully!')
+        return redirect(url_for('student.index'))
+
+    return render_template('apply.html', title='Apply', form=form, position=position)
 
 

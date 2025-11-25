@@ -164,9 +164,7 @@ class ResearchPosition(db.Model):
         return '<Position {} - Title: {} - {} - Start: {} - End: {} - Size: {} - GPA: {}>'.format(self.id, self.title, self.description, self.start_date, self.end_date, self.team_size, self.min_gpa)
 
     def get_faculty_name(self):
-        first = db.session.scalars(self.faculty.get_firstname()).first()
-        last = db.session.scalars(self.faculty.get_lastname()).first()
-        return first + ' ' + last
+        return self.faculty.get_firstname() + ' ' + self.faculty.get_lastname()
     
 
 # --- Association Table: ResearchPosition - Majors ---

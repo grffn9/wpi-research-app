@@ -1,11 +1,11 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, IntegerField, FloatField, FieldList, FormField, widgets, Form
+from wtforms import StringField, SubmitField, SelectField, IntegerField, FloatField, FieldList, FormField, widgets, Form, TextAreaField
 from wtforms.validators import  ValidationError, DataRequired
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField, QuerySelectField
 
 from app import db
 import sqlalchemy as sqla
-from app.models.models import Major, Course, Instructor, Grade,  ResearchTopic, ProgrammingLanguage
+from app.models.models import Major, Course, Instructor, Grade,  ResearchTopic, ProgrammingLanguage, Faculty
 
 
 def get_courses():
@@ -16,6 +16,19 @@ def get_instructors():
 
 def get_grades():
     return db.session.scalars(sqla.select(Grade).order_by(Grade.value)).all()
+
+def get_faculty():
+    return db.session.scalars(sqla.select(Faculty).order_by(Faculty.lastname)).all()
+
+class ApplicationForm(FlaskForm):
+    statement = TextAreaField('Statement of Interest', validators=[DataRequired()])
+    reference = QuerySelectField(
+        'Faculty Reference (Optional)',
+        query_factory=get_faculty,
+        get_label=lambda f: f"{f.firstname} {f.lastname}",
+        allow_blank=True
+    )
+    submit = SubmitField('Apply')
 
 class CourseworkForm(Form):
     course = QuerySelectField(
