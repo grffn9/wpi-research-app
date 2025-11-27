@@ -1,0 +1,18 @@
+{% extends "faculty_base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ action }} Research Topic</h2>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+            {{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control") }}
+        </div>
+
+        <button class="btn btn-success">{{ action }}</button>
+        <a class="btn btn-secondary" href="{{ url_for('faculty.list_topics') }}">Cancel</a>
+    </form>
+</div>
+{% endblock %}

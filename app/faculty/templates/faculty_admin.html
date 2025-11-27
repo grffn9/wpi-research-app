@@ -1,0 +1,24 @@
+{% extends "faculty_base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    <h2>Admin Controls</h2>
+    <p>Select a list to manage:</p>
+
+    <ul class="list-group">
+        <li class="list-group-item">
+            <a href="{{ url_for('faculty.list_majors') }}">Manage Majors</a>
+        </li>
+        <li class="list-group-item">
+            <a href="{{ url_for('faculty.list_topics') }}">Manage Research Topics</a>
+        </li>
+        <li class="list-group-item">
+            <a href="{{ url_for('faculty.list_courses') }}">Manage Courses</a>
+        </li>
+        <li class="list-group-item">
+            <a href="{{ url_for('faculty.list_languages') }}">Manage Programming Languages</a>
+        </li>
+    </ul>
+</div>
+
+{% endblock %}
