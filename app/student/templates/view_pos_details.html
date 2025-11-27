@@ -1,6 +1,7 @@
 {% extends "student_base.html" %}
 
 {% block content %}
+<div class="container">
     <br>
     <div class="card border-secondary" id="position-det-{{position.id}}" style="max-height: fit-content;">
         <h5 class="card-header border-secondary" style="text-align: center;"><strong>Position Details</strong> </h5>
@@ -25,9 +26,9 @@
                         <td>{{ position.min_gpa }}</td>
                         <td>
                             {% if position.reference_required == False %}
-                                Yes
-                            {% else %}
                                 No
+                            {% else %}
+                                Yes
                             {% endif %}
                         </td>
                     </tr>
@@ -82,5 +83,5 @@
                 <span style="color: #157dd3">{{ position.faculty.get_email()}}</span>
         </div>
     </div>
-
+</div>
 {% endblock %}

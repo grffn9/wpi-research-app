@@ -7,7 +7,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 
 import sqlalchemy as sqla
 import sqlalchemy as sqla
-from datetime import datetime
+from datetime import datetime, timezone
 from app.faculty.faculty_forms import ResearchPositionForm, AddItemForm
 from app import db
 from app.faculty import faculty_blueprint as bp_faculty
@@ -82,9 +82,9 @@ def create_position():
         db.session.commit()
 
         flash("Research position created!", "success")
-        return redirect(url_for("faculty.viewProfile"))
+        return redirect(url_for("faculty.index"))
 
-    return render_template("create_research_project.html", form=form)
+    return render_template("create_research_project.html", form=form, faculty = current_user)
 
 
 
@@ -153,7 +153,7 @@ def edit_position(position_id):
         flash("Position updated!", "success")
         return redirect(url_for("faculty.faculty_index"))
 
-    return render_template("faculty/edit_position.html", form=form, position=position)
+    return render_template("faculty/edit_position.html", form=form, position=position, faculty = current_user)
 
 
 @bp_faculty.route('/faculty/index', methods=['GET'])
@@ -161,13 +161,17 @@ def edit_position(position_id):
 def index():
     all_positions = db.session.scalars(sqla.select(ResearchPosition).where(ResearchPosition.faculty_id == current_user.id)).all()
     # all_posts  = positions.all() 
-    return render_template('faculty_index.html', title="Research Portal", positions=all_positions)
+    return render_template('faculty_index.html', title="Research Portal", positions=all_positions, faculty = current_user)
 
-@bp_faculty.route('/faculty/profile', methods=['GET'])
+@bp_faculty.route('/faculty/profile', methods=['GET', 'POST'])
 @login_required
 def viewProfile():
     # empty_form = EmptyForm()
-    return render_template('display_profile.html', title = "Display Profile", faculty = current_user)
+    if current_user.user_type == 'Faculty':
+        current_user.last_notif_time = datetime.now(timezone.utc)
+        db.session.commit()
+    refs = db.session.scalars(sqla.select(Application).where(Application.reference_id == current_user.id)).all()
+    return render_template('display_profile.html', title = "Display Profile", faculty = current_user, referals = refs)
 
 
 @bp_faculty.route('/position/<int:position_id>/applicants', methods=['GET', 'POST'])
@@ -175,7 +179,7 @@ def viewProfile():
 def view_applicants(position_id):
 
     all_applications = db.session.scalars(sqla.select(Application).where(Application.position_id == position_id)).all()
-    return render_template('view_applicants.html', applications=all_applications)
+    return render_template('view_applicants.html', applications=all_applications, faculty = current_user)
 
 
 @bp_faculty.route('/position/<int:applicant_id>/', methods=['GET', 'POST'])
@@ -183,6 +187,6 @@ def view_applicants(position_id):
 def view_one_applicant(applicant_id):
 
     student = db.session.scalars(sqla.select(Student).where(Student.id == applicant_id)).first()
-    return render_template('view_one_applicant.html', student=student)
+    return render_template('view_one_applicant.html', student=student, faculty = current_user)
 
     

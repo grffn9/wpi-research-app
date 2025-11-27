@@ -4,23 +4,92 @@
 <div class="container">
     <h1>Apply for {{ position.title }}</h1>
     
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Position Details</h5>
-            <p class="card-text">{{ position.description }}</p>
-            <p><strong>Start Date:</strong> {{ position.start_date }}</p>
-            <p><strong>End Date:</strong> {{ position.end_date }}</p>
-            <p><strong>Team Size:</strong> {{ position.team_size }}</p>
-            <p><strong>Min GPA:</strong> {{ position.min_gpa }}</p>
-            <p><strong>Faculty:</strong> {{ position.faculty.get_firstname() }} {{ position.faculty.get_lastname() }}</p>
+    <div class="card border-secondary" id="position-det-{{position.id}}" style="max-height: fit-content;">
+        <h5 class="card-header border-secondary" style="text-align: center;"><strong>Position Details</strong> </h5>
+        <div class="card-body" style = "background-color: #dbe3ec;">
+            <h5 class="card-title">{{ position.title }}</h5>
+            <p class="card-text"><strong>Description:</strong> {{ position.description }}</p><br>
+            <table class="table table-sm table-striped table-bordered" style="background-color: #dbe3ec; max-width: 650px;">
+                <thead>
+                    <tr>
+                        <th scope="col">Start Date:</th>
+                        <th scope="col">End Date:</th>
+                        <th scope="col">Team Size:</th>
+                        <th scope="col">Min GPA:</th>
+                        <th scope="col">Reference Required:</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <tr>
+                        <td>{{ position.start_date }}</td>
+                        <td>{{ position.end_date }}</td>
+                        <td>{{ position.team_size }}</td>
+                        <td>{{ position.min_gpa }}</td>
+                        <td>
+                            {% if position.reference_required == False %}
+                                No
+                            {% else %}
+                                Yes
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <br>
+            <table class="table table-sm table-striped table-bordered" style="background-color: #dbe3ec; max-width: 1000px;">
+                <thead>
+                    <tr>
+                        <th scope="col">Preferred Majors:</th>
+                        <th scope="col">Research Topics:</th>
+                        <th scope="col">Programming Languages:</th>
+                        <th scope="col">Expected Coursework</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <tr>
+                        <td>
+                            <ul class="list-group list-group-flush" >
+                            {% for major in position.preferred_majors %} 
+                                <li class="list-group-item" style="background-color: inherit;"> {{major.name}} </li>
+                            {% endfor %}
+                            </ul>
+                        </td>
+                        <td> 
+                            <ul class="list-group list-group-flush" >
+                            {% for topic in position.research_topics %} 
+                                <li class="list-group-item" style="background-color: inherit;"> {{topic.name}} </li>
+                            {% endfor %}
+                            </ul>
+                        </td>
+                        <td> 
+                            <ul class="list-group list-group-flush" >
+                            {% for lang in position.programming_languages %} 
+                                <li class="list-group-item" style="background-color: inherit;"> {{lang.name}} </li>
+                            {% endfor %}
+                            </ul>
+                        </td>
+                        <td> 
+                            <ul class="list-group list-group-flush" >
+                            {% for course in position.required_courses %} 
+                                <li class="list-group-item" style="background-color: inherit;"> {{course.title}} </li>
+                            {% endfor %}
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-    </div>
+        <div class="card-footer border-secondary" style="text-align: center;">
+            <p><strong>Posted By:</strong> {{ position.faculty.get_firstname() }} {{ position.faculty.get_lastname() }} 
+                <span style="color: #157dd3">{{ position.faculty.get_email()}}</span>
+        </div>
+    </div><br>
 
     <form action="" method="POST" novalidate>
         {{ form.hidden_tag() }}
         
         <div class="mb-3">
-            {{ form.statement.label(class="form-label") }}
+            {{ form.statement.label(class="form-label") }} <span style="color: red;">* Required</span>
             {{ form.statement(class="form-control", rows=5) }}
             {% for error in form.statement.errors %}
             <span style="color: red;">[{{ error }}]</span>

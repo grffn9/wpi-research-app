@@ -1,6 +1,7 @@
 import sys
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_required, current_user
+from datetime import datetime, timezone
 import sqlalchemy as sqla
 
 from app import db
@@ -123,11 +124,16 @@ def apply(position_id):
         if position.reference_required and not form.reference.data:
             flash('This position requires a faculty reference.')
             return render_template('apply.html', title='Apply', form=form, position=position)
+        
+        if not form.statement.data:
+            flash('A statement is required.')
+            return render_template('apply.html', title='Apply', form=form, position=position)
 
         application = Application(
             student_id=current_user.id,
             position_id=position.id,
             statement=form.statement.data,
+            submit_time = datetime.now(timezone.utc),
             status='pending'
         )
         

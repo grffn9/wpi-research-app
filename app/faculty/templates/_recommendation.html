@@ -1,0 +1,21 @@
+
+
+<div class="card border-secondary mb-3" style="max-width: 1000px;" id=rec-{{rec.id}}>
+  <div class="row g-0">
+    <div class="col-md-4" style="background-color: #dbe3ec; max-width: 20%;">
+        <div class="container"><br>
+            <button type="button" class="btn btn-primary">Awaiting Approval</button>
+        </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card-body">
+        <span class="card-text">Student: {{rec.student.get_firstname()}} {{rec.student.get_lastname()}} - <span style="color:blue">{{rec.student.get_email()}}</span> 
+            | Position Title: {{rec.position.title}}
+        </span><p></p>
+        <span class="card-text"><small class="text-body-secondary">Position Creator: {{rec.reference.get_firstname()}} {{rec.reference.get_lastname()}} 
+            <span style="color:blue">{{rec.reference.get_email()}}</span> | <small class="text-body-secondary"> Request date: {{rec.submit_time}}</small>
+        </small></span>
+      </div>
+    </div>
+  </div>
+</div>
