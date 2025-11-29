@@ -32,7 +32,12 @@ def profile():
     if current_user.user_type != 'Student':
         flash('Access denied. You must be a student to view this page.')
         return redirect(url_for('student.index'))
-    return render_template('profile.html')
+    
+    applications = db.session.scalars(
+        sqla.select(Application).where(Application.student_id == current_user.id).order_by(Application.submit_time.desc())
+    ).all()
+
+    return render_template('profile.html', applications=applications)
 
 @bp_student.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -139,6 +144,7 @@ def apply(position_id):
         
         if form.reference.data:
             application.reference_id = form.reference.data.id
+            application.reference_status = 'pending'
             
         db.session.add(application)
         db.session.commit()

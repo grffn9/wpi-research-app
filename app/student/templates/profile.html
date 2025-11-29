@@ -64,6 +64,47 @@
         </tbody>
     </table>
     <br>
+
+    <h3>My Applications</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="text-align: left;">
+                <th>Position</th>
+                <th>Date Applied</th>
+                <th>Status</th>
+                <th>Reference Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in applications %}
+            <tr>
+                <td>{{ app.position.title }}</td>
+                <td>{{ app.submit_time.strftime('%Y-%m-%d') if app.submit_time else 'N/A' }}</td>
+                <td>{{ app.status|capitalize }}</td>
+                <td>
+                    {% if app.reference_id %}
+                        {% if app.reference_status == 'pending' %}
+                            Awaiting approval
+                        {% elif app.reference_status == 'recommended' %}
+                            Recommended
+                        {% elif app.reference_status == 'not_recommended' %}
+                            Not Recommended
+                        {% else %}
+                            {{ app.reference_status }}
+                        {% endif %}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4">No applications submitted.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
     <a href="{{ url_for('student.edit_profile') }}"><button type="button">Edit Profile</button></a>
 </section>
 {% endblock %}
