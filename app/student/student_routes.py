@@ -1,6 +1,7 @@
 import sys
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_required, current_user
+from datetime import datetime, timezone
 import sqlalchemy as sqla
 
 from app import db
@@ -31,7 +32,12 @@ def profile():
     if current_user.user_type != 'Student':
         flash('Access denied. You must be a student to view this page.')
         return redirect(url_for('student.index'))
-    return render_template('profile.html')
+    
+    applications = db.session.scalars(
+        sqla.select(Application).where(Application.student_id == current_user.id).order_by(Application.submit_time.desc())
+    ).all()
+
+    return render_template('profile.html', applications=applications)
 
 @bp_student.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -123,16 +129,22 @@ def apply(position_id):
         if position.reference_required and not form.reference.data:
             flash('This position requires a faculty reference.')
             return render_template('apply.html', title='Apply', form=form, position=position)
+        
+        if not form.statement.data:
+            flash('A statement is required.')
+            return render_template('apply.html', title='Apply', form=form, position=position)
 
         application = Application(
             student_id=current_user.id,
             position_id=position.id,
             statement=form.statement.data,
+            submit_time = datetime.now(timezone.utc),
             status='pending'
         )
         
         if form.reference.data:
             application.reference_id = form.reference.data.id
+            application.reference_status = 'pending'
             
         db.session.add(application)
         db.session.commit()

@@ -6,8 +6,7 @@ from flask import render_template, flash, redirect, url_for
 from flask_login import login_user, current_user, logout_user, login_required
 
 import sqlalchemy as sqla
-import sqlalchemy as sqla
-from datetime import datetime
+from datetime import datetime, timezone
 from app.faculty.faculty_forms import ResearchPositionForm,MajorForm, ResearchTopicForm, ProgrammingLanguageForm, CourseForm
 from app import db
 from app.faculty import faculty_blueprint as bp_faculty
@@ -81,9 +80,9 @@ def create_position():
         db.session.commit()
 
         flash("Research position created!", "success")
-        return redirect(url_for("faculty.viewProfile"))
+        return redirect(url_for("faculty.index"))
 
-    return render_template("create_research_project.html", form=form)
+    return render_template("create_research_project.html", form=form, faculty = current_user)
 
 
 
@@ -119,10 +118,10 @@ def edit_position(position_id):
         (c.id, f"{c.coursenum} — {c.title}") for c in Course.query.order_by(Course.coursenum)]
 
     if request.method == "GET":
-        form.majors.data     = [m.id for m in position.majors]
-        form.topics.data     = [t.id for t in position.topics]
-        form.languages.data  = [l.id for l in position.languages]
-        form.courses.data    = [c.id for c in position.courses]
+        form.preferred_majors.data     = [m.id for m in position.preferred_majors]
+        form.research_topics.data     = [t.id for t in position.research_topics]
+        form.programming_languages.data  = [l.id for l in position.programming_languages]
+        form.required_courses.data    = [c.id for c in position.required_courses]
 
         # Format date
         if position.end_date:
@@ -153,7 +152,7 @@ def edit_position(position_id):
         flash("Position updated!", "success")
         return redirect(url_for("faculty.faculty_index"))
 
-    return render_template("faculty/edit_position.html", form=form, position=position)
+    return render_template("faculty/edit_position.html", form=form, position=position, faculty = current_user)
 
 
 @bp_faculty.route('/faculty/index', methods=['GET'])
@@ -161,13 +160,17 @@ def edit_position(position_id):
 def index():
     all_positions = db.session.scalars(sqla.select(ResearchPosition).where(ResearchPosition.faculty_id == current_user.id)).all()
     # all_posts  = positions.all() 
-    return render_template('faculty_index.html', title="Research Portal", positions=all_positions)
+    return render_template('faculty_index.html', title="Research Portal", positions=all_positions, faculty = current_user)
 
-@bp_faculty.route('/faculty/profile', methods=['GET'])
+@bp_faculty.route('/faculty/profile', methods=['GET', 'POST'])
 @login_required
 def viewProfile():
     # empty_form = EmptyForm()
-    return render_template('display_profile.html', title = "Display Profile", faculty = current_user)
+    if current_user.user_type == 'Faculty':
+        current_user.last_notif_time = datetime.now(timezone.utc)
+        db.session.commit()
+    refs = db.session.scalars(sqla.select(Application).where(Application.reference_id == current_user.id)).all()
+    return render_template('display_profile.html', title = "Display Profile", faculty = current_user, referals = refs)
 
 # ------------------ Applicants ------------------
 @bp_faculty.route('/position/<int:position_id>/applicants', methods=['GET', 'POST'])
@@ -175,7 +178,7 @@ def viewProfile():
 def view_applicants(position_id):
 
     all_applications = db.session.scalars(sqla.select(Application).where(Application.position_id == position_id)).all()
-    return render_template('view_applicants.html', applications=all_applications)
+    return render_template('view_applicants.html', applications=all_applications, faculty = current_user)
 
 
 @bp_faculty.route('/position/<int:applicant_id>/', methods=['GET', 'POST'])
@@ -184,7 +187,7 @@ def view_one_applicant(applicant_id):
 
     student = db.session.scalars(sqla.select(Student).where(Student.id == applicant_id)).first()
     application = db.session.scalars(sqla.select(Application).where(Application.student_id == applicant_id)).first()
-    return render_template('view_one_applicant.html', student=student, application=application)
+    return render_template('view_one_applicant.html', student=student, application=application, faculty = current_user)
 
 @bp_faculty.route('/application/<int:app_id>/update', methods=['POST'])
 @login_required
@@ -213,7 +216,7 @@ def update_application_status(app_id):
         flash("Application rejected")
 
     db.session.commit()
-    return redirect(url_for('faculty.view_applicants', position_id=app.id))
+    return redirect(url_for('faculty.view_applicants', position_id=app.id, faculty = current_user))
 
 
 
@@ -224,7 +227,7 @@ def list_majors():
     if current_user.user_type != "Faculty":
         abort(403)
     majors = db.session.scalars(sqla.select(Major).order_by(Major.name)).all()
-    return render_template('majors_list.html', majors=majors)
+    return render_template('majors_list.html', majors=majors, faculty = current_user)
 
 
 @bp_faculty.route('/faculty/majors/create', methods=['GET','POST'])
@@ -242,7 +245,7 @@ def create_major():
         db.session.commit()
         flash('Major created.', 'success')
         return redirect(url_for('faculty.list_majors'))
-    return render_template('majors_form.html', form=form, action='Create')
+    return render_template('majors_form.html', form=form, action='Create', faculty = current_user)
 
 
 @bp_faculty.route('/faculty/majors/<int:major_id>/edit', methods=['GET','POST'])
@@ -258,7 +261,7 @@ def edit_major(major_id):
         db.session.commit()
         flash('Major updated.', 'success')
         return redirect(url_for('faculty.list_majors'))
-    return render_template('majors_form.html', form=form, action='Edit')
+    return render_template('majors_form.html', form=form, action='Edit', faculty = current_user)
 
 
 @bp_faculty.route('/faculty/majors/<int:major_id>/delete', methods=['POST'])
@@ -283,7 +286,7 @@ def list_topics():
     topics = db.session.scalars(
         sqla.select(ResearchTopic).order_by(ResearchTopic.name)
     ).all()
-    return render_template('topics_list.html', topics=topics)
+    return render_template('topics_list.html', topics=topics, faculty = current_user)
 
 
 @bp_faculty.route('/faculty/topics/create', methods=['GET','POST'])
@@ -300,7 +303,7 @@ def create_topic():
         db.session.commit()
         flash('Research topic created.', 'success')
         return redirect(url_for('faculty.list_topics'))
-    return render_template('topics_form.html', form=form, action='Create')
+    return render_template('topics_form.html', form=form, action='Create', faculty = current_user)
 
 
 @bp_faculty.route('/faculty/topics/<int:topic_id>/edit', methods=['GET','POST'])
@@ -315,7 +318,7 @@ def edit_topic(topic_id):
         db.session.commit()
         flash('Research topic updated.', 'success')
         return redirect(url_for('faculty.list_topics'))
-    return render_template('topics_form.html', form=form, action='Edit')
+    return render_template('topics_form.html', form=form, action='Edit', faculty = current_user)
 
 
 @bp_faculty.route('/faculty/topics/<int:topic_id>/delete', methods=['POST'])
@@ -336,7 +339,7 @@ def list_courses():
     if current_user.user_type != "Faculty":
         abort(403)
     Courses = db.session.scalars(sqla.select(Course).order_by(Course.coursenum)).all()
-    return render_template('courses_list.html', courses=Courses)
+    return render_template('courses_list.html', courses=Courses,  faculty = current_user)
 
 
 @bp_faculty.route('/faculty/courses/create', methods=['GET','POST'])
@@ -351,7 +354,7 @@ def create_course():
         db.session.commit()
         flash('Course created.', 'success')
         return redirect(url_for('faculty.list_courses'))
-    return render_template('courses_form.html', form=form, action='Create')
+    return render_template('courses_form.html', form=form, action='Create',  faculty = current_user)
 
 @bp_faculty.route('/faculty/courses/<int:course_id>/edit', methods=['GET','POST'])
 @login_required
@@ -367,7 +370,7 @@ def edit_course(course_id):
         db.session.commit()
         flash('Course updated.', 'success')
         return redirect(url_for('faculty.list_courses'))
-    return render_template('courses_form.html', form=form, action='Edit')
+    return render_template('courses_form.html', form=form, action='Edit', faculty = current_user)
 
 @bp_faculty.route('/faculty/courses/<int:course_id>/delete', methods=['POST'])
 @login_required
@@ -389,7 +392,7 @@ def list_languages():
     languages = db.session.scalars(
         sqla.select(ProgrammingLanguage).order_by(ProgrammingLanguage.name)
     ).all()
-    return render_template('languages_list.html', languages=languages)
+    return render_template('languages_list.html', languages=languages,  faculty = current_user)
 
 
 @bp_faculty.route('/faculty/languages/create', methods=['GET','POST'])
@@ -406,7 +409,7 @@ def create_language():
         db.session.commit()
         flash('Programming language created.', 'success')
         return redirect(url_for('faculty.list_languages'))
-    return render_template('languages_form.html', form=form, action='Create')
+    return render_template('languages_form.html', form=form, action='Create',  faculty = current_user)
 
 
 @bp_faculty.route('/faculty/languages/<int:language_id>/edit', methods=['GET','POST'])
@@ -421,7 +424,7 @@ def edit_language(language_id):
         db.session.commit()
         flash('Programming language updated.', 'success')
         return redirect(url_for('faculty.list_languages'))
-    return render_template('languages_form.html', form=form, action='Edit')
+    return render_template('languages_form.html', form=form, action='Edit', faculty = current_user)
 
 
 @bp_faculty.route('/faculty/languages/<int:language_id>/delete', methods=['POST'])
@@ -440,4 +443,6 @@ def delete_language(language_id):
 def admin_home():
     if current_user.user_type != "Faculty":
         abort(403)
-    return render_template('faculty_admin.html')
+    return render_template('faculty_admin.html', faculty = current_user)
+
+    

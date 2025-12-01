@@ -3,6 +3,7 @@
 {% block content %}
 <section>
     <h1>Edit Profile</h1>
+    <div class="border rounded-3 bg-light p-3" style="max-width:99%;">
     <form action="" method="POST" novalidate>
         {{ form.hidden_tag() }}
 
@@ -76,7 +77,7 @@
         </p>
 
         <h3>Advanced Coursework</h3>
-        <table style="width: 100%;">
+        <table class="table">
             <thead>
                 <tr>
                     <th>Advanced Course</th>
@@ -109,13 +110,14 @@
                 {% endfor %}
             </tbody>
         </table>
-        <button type="button" id="add-course-btn">Add New Course</button>
+        <button type="button" id="add-course-btn">Add New Course</button><br>
         {% for error in form.coursework.errors %}
         <p style="color: red;">{{ error }}</p>
         {% endfor %}
 
-        <p>{{ form.submit() }}</p>
+        <br><p>{{ form.submit() }}</p>
     </form>
+    </div>
 </section>
 
 <script>

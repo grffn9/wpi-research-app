@@ -103,6 +103,8 @@ class Faculty(User):
 
     id : sqlo.Mapped[int] = sqlo.mapped_column(sqla.ForeignKey(User.id), primary_key=True)
     is_verified: sqlo.Mapped[bool] = sqlo.mapped_column(default=False)
+    #when was the last time the faculty saw their reference notifications
+    last_notif_time: sqlo.Mapped[Optional[datetime]] = sqlo.mapped_column(default = lambda : datetime.now(timezone.utc))
     
     positions: sqlo.Mapped[list["ResearchPosition"]] = sqlo.relationship(
         back_populates="faculty"
@@ -114,6 +116,13 @@ class Faculty(User):
     __mapper_args__ = {
     'polymorphic_identity': 'Faculty'
     }
+    def unread_notif_count(self):
+        last_read = self.last_notif_time or datetime(1900, 1, 1)
+        unread_count = db.session.scalars(sqla.select(sqla.func.count()).select_from(
+            sqla.select(Application).where(Application.reference_id == self.id,
+                                           Application.submit_time > last_read))
+        ).first()
+        return unread_count
 
 
     
@@ -131,13 +140,14 @@ class ResearchPosition(db.Model):
     team_size:           Mapped[int] = mapped_column(Integer, nullable=False)
     min_gpa:             Mapped[float] = mapped_column(nullable=False)
     reference_required:  Mapped[bool] = mapped_column(Boolean, default=False)
-
+    
     
     # Foreign key for Faculty who created the position
     faculty_id: Mapped[int] = mapped_column(
         ForeignKey("faculty.id"), nullable=False
     )
     faculty: Mapped[Faculty] = relationship(back_populates="positions")
+    
 
     # Many-to-many relationships
     preferred_majors: Mapped[list["Major"]] = relationship(
@@ -165,6 +175,8 @@ class ResearchPosition(db.Model):
 
     def get_faculty_name(self):
         return self.faculty.get_firstname() + ' ' + self.faculty.get_lastname()
+    
+    
     
 
 # --- Association Table: ResearchPosition - Majors ---
@@ -353,8 +365,6 @@ class Student(User):
 
     def get_coursework(self):
         return self.coursework
-        query = self.coursework.select()
-        return db.session.scalars(query).all()
 
 
 ######################################################
@@ -367,7 +377,9 @@ class Application(db.Model):
 
     id: sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
     status: sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(10), default="pending")
+    reference_status: sqlo.Mapped[Optional[str]] = sqlo.mapped_column(sqla.String(20), nullable=True)
     statement: sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(1000), nullable=False)
+    submit_time: sqlo.Mapped[Optional[datetime]] = sqlo.mapped_column(default = lambda : datetime.now(timezone.utc))
 
     student_id: sqlo.Mapped[int] = sqlo.mapped_column(
         sqla.ForeignKey("student.id"), index=True, nullable=False
@@ -402,3 +414,6 @@ class Application(db.Model):
             return True
         else:
             return False
+        
+
+

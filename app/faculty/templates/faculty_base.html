@@ -28,7 +28,11 @@
                         <a class="nav-link" aria-current="page" href="{{ url_for('faculty.index') }}">Research</a>
                     </li>
                     <li class="nav-item border border-light px-2 ms-2 ">
-                        <a class="nav-link" aria-current="page" href="{{ url_for('faculty.viewProfile')}}" class = "button">View Profile</a>
+                        <a class="nav-link" aria-current="page" href="{{ url_for('faculty.viewProfile')}}" class = "button">View Profile
+                            {% if faculty.unread_notif_count() != 0 %}
+                                <span class="badge text-bg-danger">{{ faculty.unread_notif_count() }}</span>
+                            {% endif %}
+                        </a>
                     </li>
                     <li class="nav-item border border-light px-2 ms-2 ">
                         <a class="nav-link" aria-current="page" href="{{ url_for('faculty.create_position')}}">Create Position</a>
