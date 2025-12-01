@@ -118,10 +118,10 @@ def edit_position(position_id):
         (c.id, f"{c.coursenum} — {c.title}") for c in Course.query.order_by(Course.coursenum)]
 
     if request.method == "GET":
-        form.majors.data     = [m.id for m in position.majors]
-        form.topics.data     = [t.id for t in position.topics]
-        form.languages.data  = [l.id for l in position.languages]
-        form.courses.data    = [c.id for c in position.courses]
+        form.preferred_majors.data     = [m.id for m in position.preferred_majors]
+        form.research_topics.data     = [t.id for t in position.research_topics]
+        form.programming_languages.data  = [l.id for l in position.programming_languages]
+        form.required_courses.data    = [c.id for c in position.required_courses]
 
         # Format date
         if position.end_date:

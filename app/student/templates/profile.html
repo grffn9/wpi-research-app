@@ -3,70 +3,101 @@
 {% block content %}
 <section>
     <h1>Student Profile</h1>
+    <div class="border rounded-3 bg-light p-3" style="max-width:99%;">
+    <h3>{{ current_user.firstname }} {{ current_user.lastname }}</h3>   
     <hr>
 
-    <h3>{{ current_user.firstname }} {{ current_user.lastname }}</h3>
     <p><strong>Username:</strong> {{ current_user.username }}</p>
     <p><strong>Email:</strong> {{ current_user.email }}</p>
     <p><strong>WPI ID:</strong> {{ current_user.wpi_id }}</p>
     <p><strong>GPA:</strong> {{ current_user.gpa }}</p>
 
-    <h3>Majors</h3>
-    <ul>
+    <table class = "table table-light table-hover table-bordered border-3 align-middle">
+    <thead>
+        <tr>
+            <th>Majors</th>
+        </tr>
+    </thead>
+    <tbody>
         {% for major in current_user.get_majors() %}
-        <li>{{ major.name }} ({{ major.department }})</li>
+        <tr>
+            <td>{{ major.name }} ({{ major.department }})</td>
+        </tr>
         {% else %}
-        <li>No majors listed.</li>
+        <tr>
+            <td>No majors listed.</td>
+        </tr>
         {% endfor %}
-    </ul>
+    </tbody>
+    </table>
 
-    <h3>Research Topics</h3>
-    <ul>
+   <table class = "table table-light table-hover table-bordered border-3 align-middle">
+    <thead>
+        <tr>
+            <th>Research Topics</th>
+        </tr>
+    </thead>
+    <tbody>
         {% for topic in current_user.get_research_topics() %}
-        <li>{{ topic.name }}</li>
+        <tr>
+            <td>{{ topic.name }}</td>
+        </tr>
         {% else %}
-        <li>No research topics listed.</li>
+        <tr>
+            <td>No research topics listed.</td>
+        </tr>
         {% endfor %}
-    </ul>
+    </tbody>
+    </table>
 
-    <h3>Programming Languages</h3>
-    <ul>
+    <table class = "table table-light table-hover table-bordered border-3 align-middle">
+    <thead>
+        <tr>
+            <th>Programming Languages</th>
+        </tr>
+    </thead>
+    <tbody>
         {% for lang in current_user.get_programming_languages() %}
-        <li>{{ lang.name }}</li>
+        <tr>
+            <td>{{ lang.name }}</td>
+        </tr>
         {% else %}
-        <li>No programming languages listed.</li>
+        <tr>
+            <td>No programming languages listed.</td>
+        </tr>
         {% endfor %}
-    </ul>
+    </tbody>
+    </table>
 
     <h3>Coursework</h3>
-    <table style="width: 100%; border-collapse: collapse;">
-        <thead>
-            <tr style="text-align: left;">
-                <th>Course Num</th>
-                <th>Title</th>
-                <th>Instructor</th>
-                <th>Grade</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for course_record in current_user.get_coursework() %}
-            <tr>
-                <td>{{ course_record.course.coursenum }}</td>
-                <td>{{ course_record.course.title }}</td>
-                <td>{{ course_record.instructor.name }}</td>
-                <td>{{ course_record.grade.value }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="4">No coursework listed.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <br>
+        <table class = "table table-light table-hover table-bordered border-3 align-middle">
+            <thead>
+                <tr style="text-align: left;">
+                    <th>Course Num</th>
+                    <th>Title</th>
+                    <th>Instructor</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course_record in current_user.get_coursework() %}
+                <tr>
+                    <td>{{ course_record.course.coursenum }}</td>
+                    <td>{{ course_record.course.title }}</td>
+                    <td>{{ course_record.instructor.name }}</td>
+                    <td>{{ course_record.grade.value }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4">No coursework listed.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
 
     <h3>My Applications</h3>
-    <table style="width: 100%; border-collapse: collapse;">
+    <table class = "table table-light table-hover table-bordered border-3 align-middle">
         <thead>
             <tr style="text-align: left;">
                 <th>Position</th>
@@ -105,6 +136,7 @@
         </tbody>
     </table>
     <br>
-    <a href="{{ url_for('student.edit_profile') }}"><button type="button">Edit Profile</button></a>
+    <a href="{{ url_for('student.edit_profile') }}"><button type="button" class="btn btn-primary">Edit Profile</button></a>
+    </div>
 </section>
 {% endblock %}
