@@ -33,7 +33,22 @@ def create_position():
         (c.id, f"{c.coursenum} — {c.title}") for c in Course.query.order_by(Course.coursenum)]
     
     if form.validate_on_submit():
+        
 
+        from datetime import date
+
+        today = date.today()
+
+        if form.start_date.data < today:
+            flash("Start date cannot be earlier than today's date.", "danger")
+            return render_template("create_research_project.html", form=form, faculty=current_user)
+
+        if form.start_date.data and form.end_date.data:
+            if form.end_date.data < form.start_date.data:
+                flash("End date cannot be earlier than the start date.", "danger")
+                return render_template("create_research_project.html", form=form, faculty=current_user)
+        
+        
         # Create position
         position = ResearchPosition(
             title=form.title.data,
@@ -125,7 +140,7 @@ def edit_position(position_id):
 
         # Format date
         if position.end_date:
-            form.end_date.data = position.end_date.strftime("%Y-%m-%d")
+            form.end_date.data = position.end_date
 
     if form.validate_on_submit():
 
@@ -139,7 +154,7 @@ def edit_position(position_id):
         # Update deadline
         position.end_date = None
         if form.end_date.data:
-            position.end_date = datetime.strptime(form.end_date.data, "%Y-%m-%d")
+            position.end_date = form.end_date.data
 
         # Clear and replace many-to-many
         position.majors    = Major.query.filter(Major.id.in_(form.majors.data)).all()
@@ -152,7 +167,7 @@ def edit_position(position_id):
         flash("Position updated!", "success")
         return redirect(url_for("faculty.faculty_index"))
 
-    return render_template("faculty/edit_position.html", form=form, position=position, faculty = current_user)
+    return render_template("edit_position.html", form=form, position=position, faculty = current_user)
 
 
 @bp_faculty.route('/faculty/index', methods=['GET'])
