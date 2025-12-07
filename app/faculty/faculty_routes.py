@@ -1,8 +1,7 @@
 # /faculty/profile
 import sys
 from xml.parsers.expat import model
-from flask import render_template, flash, redirect, url_for, abort, request
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, abort, request, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 
 import sqlalchemy as sqla
@@ -460,4 +459,3 @@ def admin_home():
         abort(403)
     return render_template('faculty_admin.html', faculty = current_user)
 
-    
