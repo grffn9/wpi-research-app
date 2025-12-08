@@ -3,6 +3,16 @@
 {% block content %}
 
     <h1>Hello Student. Welcome to the WPI Research Application Portal!</h1>
+
+     <form action="" method="post">
+            {{ form.hidden_tag()  }}
+
+            {{form.recommended.label}} 
+            {{ form.recommended(class="form-check-input") }}
+            {{ form.submit(class="btn btn-primary") }}
+
+        </form>
+
     <!-- TODO: (milestone1) Display smile count.   -->
     <h3>Number of positions:  </h3><br>
 

@@ -10,7 +10,7 @@ from app import login
 import sqlalchemy as sqla
 import sqlalchemy.orm as sqlo
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, Text, Integer, Date, Boolean, ForeignKey, text
+from sqlalchemy import String, Text, Integer, Date, Boolean, ForeignKey, func, text
 from app import db
 
 
@@ -365,6 +365,18 @@ class Student(User):
 
     def get_coursework(self):
         return self.coursework
+
+    def get_recommended_positions(self):
+        scores = []
+        for pos in ResearchPosition.query.all():
+            overlap = 0
+            #get intersection of student's attributes with position's preferred attributes
+            overlap += len(set(self.majors_of_student) & set(pos.preferred_majors))
+            overlap += len(set(self.programming_languages) & set(pos.programming_languages))
+            overlap += len(set(self.research_topics) & set(pos.research_topics))
+            overlap += len(set(self.coursework) & set(pos.required_courses))
+            scores.append((pos, overlap))
+        return sorted(scores, key=lambda x: (-x[1], x[0].start_date))
 
 
 ######################################################
