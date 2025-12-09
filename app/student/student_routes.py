@@ -153,4 +153,26 @@ def apply(position_id):
 
     return render_template('apply.html', title='Apply', form=form, position=position)
 
+@bp_student.route('/withdraw_application/<int:app_id>', methods=['POST'])
+@login_required
+def withdraw_application(app_id):
+    application = db.session.scalar(sqla.select(Application).where(Application.id == app_id))
+    
+    if application is None:
+        flash("Application not found.", "danger")
+        return redirect(url_for('student.profile'))
+        
+    if application.student_id != current_user.id:
+        flash("You do not have permission to withdraw this application.", "danger")
+        return redirect(url_for('student.profile'))
+
+    if application.status != 'pending':
+        flash("Cannot withdraw an application that is not pending.", "danger")
+        return redirect(url_for('student.profile'))
+
+    db.session.delete(application)
+    db.session.commit()
+    flash("Application has been withdrawn.", "success")
+    return redirect(url_for('student.profile'))
+
 
