@@ -376,7 +376,7 @@ class Application(db.Model):
     __tablename__ = "application"
 
     id: sqlo.Mapped[int] = sqlo.mapped_column(primary_key=True)
-    status: sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(10), default="pending")
+    status: sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(10), default="Pending")
     reference_status: sqlo.Mapped[Optional[str]] = sqlo.mapped_column(sqla.String(20), nullable=True)
     statement: sqlo.Mapped[str] = sqlo.mapped_column(sqla.String(1000), nullable=False)
     submit_time: sqlo.Mapped[Optional[datetime]] = sqlo.mapped_column(default = lambda : datetime.now(timezone.utc))

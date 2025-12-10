@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, IntegerField, FloatField,BooleanField, SelectMultipleField, DateField, widgets
+from wtforms import StringField, SubmitField, IntegerField, FloatField,BooleanField, SelectField, DateField, widgets
 from wtforms.validators import  ValidationError, DataRequired
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField, QuerySelectField
 from datetime import datetime
@@ -93,3 +93,8 @@ class CourseForm(FlaskForm):
     coursenum = StringField("Course Number", validators=[DataRequired(), Length(max=10)])
     title = StringField("Course Title", validators=[DataRequired(), Length(max=150)])
     submit = SubmitField("Save")
+
+class RecommendationForm(FlaskForm):
+    rec_status = SelectField( choices=[("Pending","Change"), ("Confirmed", "Recommend"), ("Denied", "Deny")])
+    application_id = int
+    submit = SubmitField("Confirm")

@@ -13,7 +13,7 @@
     <p><strong>GPA:</strong> {{ current_user.gpa }}</p>
 
     <table class = "table table-light table-hover table-bordered border-3 align-middle">
-    <thead>
+    <thead class="table-secondary">
         <tr>
             <th>Majors</th>
         </tr>
@@ -32,7 +32,7 @@
     </table>
 
    <table class = "table table-light table-hover table-bordered border-3 align-middle">
-    <thead>
+    <thead class="table-secondary">
         <tr>
             <th>Research Topics</th>
         </tr>
@@ -51,7 +51,7 @@
     </table>
 
     <table class = "table table-light table-hover table-bordered border-3 align-middle">
-    <thead>
+    <thead class="table-secondary">
         <tr>
             <th>Programming Languages</th>
         </tr>
@@ -71,7 +71,7 @@
 
     <h3>Coursework</h3>
         <table class = "table table-light table-hover table-bordered border-3 align-middle">
-            <thead>
+            <thead class="table-secondary">
                 <tr style="text-align: left;">
                     <th>Course Num</th>
                     <th>Title</th>
@@ -98,7 +98,7 @@
 
     <h3>My Applications</h3>
     <table class = "table table-light table-hover table-bordered border-3 align-middle">
-        <thead>
+        <thead class="table-secondary">
             <tr style="text-align: left;">
                 <th>Position</th>
                 <th>Date Applied</th>
@@ -114,11 +114,11 @@
                 <td>{{ app.status|capitalize }}</td>
                 <td>
                     {% if app.reference_id %}
-                        {% if app.reference_status == 'pending' %}
+                        {% if app.reference_status == 'Pending' %}
                             Awaiting approval
-                        {% elif app.reference_status == 'recommended' %}
+                        {% elif app.reference_status == 'Confirmed' %}
                             Recommended
-                        {% elif app.reference_status == 'not_recommended' %}
+                        {% elif app.reference_status == 'Denied' %}
                             Not Recommended
                         {% else %}
                             {{ app.reference_status }}

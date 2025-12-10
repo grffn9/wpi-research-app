@@ -1,21 +1,53 @@
-
-
-<div class="card border-secondary mb-3" style="max-width: 1000px;" id=rec-{{rec.id}}>
-  <div class="row g-0">
-    <div class="col-md-4" style="background-color: #dbe3ec; max-width: 20%;">
-        <div class="container"><br>
-            <span class="badge text-bg-primary">Awaiting Approval</span>
-        </div>
-    </div>
-    <div class="col-md-8">
-      <div class="card-body">
-        <span class="card-text">Student: {{rec.student.get_firstname()}} {{rec.student.get_lastname()}} - <span style="color:blue">{{rec.student.get_email()}}</span> 
-            | Position Title: {{rec.position.title}}
-        </span><p></p>
-        <span class="card-text"><small class="text-body-secondary">Position Creator: {{rec.position.faculty.get_firstname()}} {{rec.position.faculty.get_lastname()}} 
-            <span style="color:blue">{{rec.position.faculty.get_email()}}</span> | <small class="text-body-secondary"> Request date: {{rec.submit_time}}</small>
-        </small></span>
-      </div>
+<div class="accordion-item">
+  <h2 class="accordion-header">
+    <button class="accordion-button collapsed" type="button" aria-expanded="false" aria-controls="flush-collapseOne" onclick="toggleAccordion({{rec.id}})" style="background-color: #dbe3ec;">
+      <span>Recommendation Request for: {{rec.student.get_firstname()}} {{rec.student.get_lastname()}} - <span style="color:blue">{{rec.student.get_email()}}</span>
+          for {{rec.position.title}} | 
+          {% if rec.reference_status == 'Pending' %}
+            <span class="badge text-bg-primary">Pending</span>
+          {% elif rec.reference_status == 'Confirmed' %}
+            <span class="badge text-bg-success">Confirmed</span>
+          {% elif rec.reference_status == 'Denied' %}
+            <span class="badge text-bg-danger">Denied</span>
+          {% else %}
+            <span class="badge text-bg-primary">{{rec.reference_status}}</span>
+          {% endif %}
+      </span>
+    </button>
+  </h2>
+  <div id="flush-collapse-{{rec.id}}" class="accordion-collapse" hidden="true">
+    <div class="accordion-body"><b>Change Recommendation Status</b><br>
+      {% if form %}
+        <form action="{{ url_for('faculty.change_rec_status', rec_id = rec.id) }}" method="POST">
+            {{ form.hidden_tag() }}
+          <div style="margin: 10px 0 10px 0; max-width: 200px;">
+            {{ form.rec_status(class="form-control rounded-1") }}
+          </div>
+          <div style="margin: 10px 0 10px 0; max-width: 150px;">
+            {{ form.submit(class="form-control text-bg-primary rounded-3") }}
+          </div>
+        </form>
+      {% endif %}
     </div>
   </div>
 </div>
+
+{% block script %}
+<script>
+  function toggleAccordion(rec_id){
+    console.log(rec_id)
+    let element = document.getElementById(`flush-collapse-${rec_id}`)
+    if (element.hidden == true){
+      console.log("Item was hidden")
+      element.hidden = false
+    }
+    else if (element.hidden == false){
+      console.log("Item was not hidden")
+      element.hidden = true
+    }
+    else{
+      console.log(element.hidden)
+    }
+  }
+</script>
+{% endblock %}

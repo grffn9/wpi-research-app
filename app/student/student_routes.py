@@ -144,7 +144,7 @@ def apply(position_id):
         
         if form.reference.data:
             application.reference_id = form.reference.data.id
-            application.reference_status = 'pending'
+            application.reference_status = 'Pending'
             
         db.session.add(application)
         db.session.commit()

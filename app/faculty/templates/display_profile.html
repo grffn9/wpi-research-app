@@ -10,8 +10,10 @@
         <p> <b>Email:</b> {% if faculty.get_email() %}{{faculty.get_email()}} {% endif %}</p>
         <hr>
         <h2>Recommendations</h2>
+        <div class="accordion accordion-flush" id="accordionFlushExample">
             {% for rec in referals%}
                 {% include '_recommendation.html'%}
             {% endfor %}
+        </div>
     </div>
 {% endblock %}
