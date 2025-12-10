@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, IntegerField, FloatField, FieldList, FormField, widgets, Form, TextAreaField
+from wtforms import BooleanField, StringField, SubmitField, SelectField, IntegerField, FloatField, FieldList, FormField, widgets, Form, TextAreaField
 from wtforms.validators import  ValidationError, DataRequired
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField, QuerySelectField
 
@@ -85,3 +85,7 @@ class EditProfileForm(FlaskForm):
     coursework = FieldList(FormField(CourseworkForm), min_entries=0)
     
     submit = SubmitField('Update Profile')
+
+class SortForm(FlaskForm):
+    recommended = BooleanField('Recommended Positions', default=False)
+    submit = SubmitField("Refresh")

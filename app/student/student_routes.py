@@ -6,17 +6,25 @@ import sqlalchemy as sqla
 
 from app import db
 
-from app.student.student_forms import EditProfileForm, get_courses, get_grades, get_instructors, ApplicationForm
+from app.student.student_forms import EditProfileForm, get_courses, get_grades, get_instructors, ApplicationForm, SortForm
 from app.models.models import StudentCourse, ResearchPosition, Application
 
 from app.student import student_blueprint as bp_student
 
 # @bp_student.route('/', methods=['GET'])
-@bp_student.route('/student/index', methods=['GET'])
+@bp_student.route('/student/index', methods=['GET', 'POST'])
 @login_required
 def index():
+    sform = SortForm()
+ 
     all_positions = db.session.scalars(sqla.select(ResearchPosition)).all()
-    
+
+    if sform.validate_on_submit():
+        if sform.recommended.data:
+            results = current_user.get_recommended_positions()
+            all_positions = [pos for pos, _ in results]
+
+       
     applied_ids = []
     if current_user.user_type == 'Student':
         applications = db.session.scalars(
@@ -24,7 +32,7 @@ def index():
         ).all()
         applied_ids = [app.position_id for app in applications]
 
-    return render_template('student_index.html', title="Research Application Portal", positions=all_positions, applied_ids=applied_ids)
+    return render_template('student_index.html', title="Research Application Portal", positions=all_positions, applied_ids=applied_ids, form=sform)
 
 @bp_student.route('/profile', methods=['GET'])
 @login_required
