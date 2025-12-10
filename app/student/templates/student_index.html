@@ -4,14 +4,24 @@
 
     <h1>Hello Student. Welcome to the WPI Research Application Portal!</h1>
 
-     <form action="" method="post">
+
+    <form method="POST" id="toggleForm">
+        {{ form.hidden_tag() }} 
+        <div class="form-check form-switch">
+            {{ form.recommended(class_="form-check-input", id="flexSwitchCheckDefault", onchange="this.form.submit()") }}
+            <label class="form-check-label" for="flexSwitchCheckDefault">View Recommended Positions</label>
+        </div>
+    </form>
+
+
+     <!-- <form action="" method="post">
             {{ form.hidden_tag()  }}
 
-            {{form.recommended.label}} 
-            {{ form.recommended(class="form-check-input") }}
+            {{form.recommended.label(class="form-check-label", style="font-size: 1.2rem;") }} 
+            {{ form.recommended(class="form-check-input large" ) }}
             {{ form.submit(class="btn btn-primary") }}
 
-        </form>
+        </form> -->
 
     <!-- TODO: (milestone1) Display smile count.   -->
     <h3>Number of positions:  </h3><br>
