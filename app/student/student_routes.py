@@ -161,15 +161,26 @@ def apply(position_id):
 
     return render_template('apply.html', title='Apply', form=form, position=position)
 
-@bp_student.route('/position/view/<int:position_id>', methods=['GET'])
+@bp_student.route('/withdraw_application/<int:app_id>', methods=['POST'])
 @login_required
-def view_pos(position_id):
-    if current_user.user_type != 'Student':
-        flash('Access denied. You must be a student to view this position.')
-        return redirect(url_for('student.index'))
-    position = db.session.scalars(
-        sqla.select(ResearchPosition).where(ResearchPosition.id == position_id)).first()
-    if not position:
-        flash('Position not found.')
-        return redirect(url_for('student.index'))
-    return render_template('view_pos_details.html', title='View Position', position=position)
+def withdraw_application(app_id):
+    application = db.session.scalar(sqla.select(Application).where(Application.id == app_id))
+    
+    if application is None:
+        flash("Application not found.", "danger")
+        return redirect(url_for('student.profile'))
+        
+    if application.student_id != current_user.id:
+        flash("You do not have permission to withdraw this application.", "danger")
+        return redirect(url_for('student.profile'))
+
+    if application.status != 'pending':
+        flash("Cannot withdraw an application that is not pending.", "danger")
+        return redirect(url_for('student.profile'))
+
+    db.session.delete(application)
+    db.session.commit()
+    flash("Application has been withdrawn.", "success")
+    return redirect(url_for('student.profile'))
+
+
