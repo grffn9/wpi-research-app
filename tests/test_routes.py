@@ -12,6 +12,7 @@ from config import Config
 import sqlalchemy as sqla
 from datetime import datetime, date
 
+
 class TestConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
     SECRET_KEY = 'bad-bad-key'
@@ -32,7 +33,7 @@ def test_client():
 def init_database():
     db.create_all()
     
-    m1 = Major(name="Computer Science")
+    m1 = Major(name="Computer Science", department="CS Dept")
     t1 = ResearchTopic(name="AI")
     l1 = ProgrammingLanguage(name="Python")
     c1 = Course(coursenum="CS101", title="Intro to CS", major=m1)
@@ -42,9 +43,8 @@ def init_database():
     db.session.add_all([m1, t1, l1, c1, i1, g1])
     db.session.commit()
     
-    f1 = Faculty(username='faculty1', email='faculty1@wpi.edu', firstname='Fac', lastname='Ulty')
+    f1 = Faculty(username='faculty1', email='faculty1@wpi.edu', firstname='Fac', lastname='Ulty', is_verified=True)
     f1.set_password('password')
-    f1.is_verified = True
     db.session.add(f1)
     db.session.commit()
     
@@ -76,11 +76,26 @@ def login_student(test_client):
         follow_redirects=True
     )
 
+def login_faculty(test_client):
+    return test_client.post('/user/login',
+        data=dict(email='faculty1@wpi.edu', password='password'),
+        follow_redirects=True
+    )
+
+def do_logout(test_client, path):
+    response = test_client.get(path,                       
+                          follow_redirects = True)
+    assert response.status_code == 200
+    assert b"Sign In" in response.data
+    assert b"New User?" in response.data    
+
+
 def test_student_index(test_client, init_database):
     login_student(test_client)
     response = test_client.get('/student/index')
     assert response.status_code == 200
     assert b"AI Research" in response.data
+    do_logout(test_client, path = '/user/logout')
 
 def test_student_profile(test_client, init_database):
     login_student(test_client)
@@ -89,6 +104,7 @@ def test_student_profile(test_client, init_database):
     assert response.status_code == 200
     assert b"Stu" in response.data 
     assert b"Dent" in response.data
+    do_logout(test_client, path = '/user/logout')
 
 def test_edit_profile(test_client, init_database):
     login_student(test_client)
@@ -113,6 +129,8 @@ def test_edit_profile(test_client, init_database):
     s1 = db.session.scalars(sqla.select(Student).where(Student.username == 'student1')).first()
     assert s1.lastname == 'Updated'
     assert s1.gpa == 3.8
+    do_logout(test_client, path = '/user/logout')
+
 
 def test_apply(test_client, init_database):
     login_student(test_client)
@@ -133,6 +151,8 @@ def test_apply(test_client, init_database):
     assert app is not None
     assert app.position_id == p1.id
     assert app.statement == 'I am very interested.'
+    do_logout(test_client, path = '/user/logout')
+
 
 def test_withdraw_application(test_client, init_database):
     login_student(test_client)
@@ -149,4 +169,156 @@ def test_withdraw_application(test_client, init_database):
     
     app_check = db.session.get(Application, app.id)
     assert app_check is None
+    do_logout(test_client, path = '/user/logout')
+
     
+def test_list_majors(test_client,init_database):
+
+    # faculty login
+    login_faculty(test_client)
+
+        
+    response = test_client.get('/faculty/majors')
+    assert response.status_code == 200
+    assert b"Majors" in response.data
+    do_logout(test_client, path = '/user/logout')
+
+    # student login
+    login_student(test_client)
+    
+    response = test_client.get('/faculty/majors', follow_redirects=True)
+    assert response.status_code == 403
+    do_logout(test_client, path = '/user/logout')
+
+
+
+def test_create_major(test_client,init_database):
+ #first login
+    login_faculty(test_client)
+    
+    #test the create major form 
+    response = test_client.get('/faculty/majors/create')
+    assert response.status_code == 200
+    assert b"Create Major" in response.data 
+
+    
+    #test posting a major
+    response = test_client.post('/faculty/majors/create', 
+                          data=dict(name = 'test', department = 'Testing Department'),  
+                          follow_redirects = True)
+    assert response.status_code == 200
+    assert b"test" in response.data
+    assert b"Testing Department" in response.data 
+
+    m  = db.session.scalars(sqla.select(Major).where(Major.name == 'test').where(Major.department == "Testing Department")).first()
+    m_count = db.session.scalar(sqla.select(db.func.count()).where(Major.name == 'test').where(Major.department == "Testing Department"))
+    assert m.get_name() == 'test'
+    assert m_count == 1
+
+    do_logout(test_client, path = '/user/logout')
+
+    # student login
+    login_student(test_client)
+    
+    response = test_client.get('/faculty/majors/create', follow_redirects=True)
+    assert response.status_code == 403
+    do_logout(test_client, path = '/user/logout')
+
+
+def test_edit_major(test_client,init_database):
+ #first login
+    login_faculty(test_client)
+
+    #get current values
+    response = test_client.get('/faculty/majors/1/edit', follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Edit Major" in response.data 
+    assert b"Computer Science" in response.data
+    assert b"CS Dept" in response.data
+
+
+    #edit values
+    response = test_client.post('/faculty/majors/1/edit', 
+                          data=dict(name = 'new name', department = 'new Department'),  
+                          follow_redirects = True)
+    assert response.status_code == 200
+    assert b"new name" in response.data
+    assert b"new Department" in response.data 
+    m  = db.session.scalars(sqla.select(Major).where(Major.name == 'new name').where(Major.department == "new Department")).first()
+    m_count = db.session.scalar(sqla.select(db.func.count()).where(Major.name == 'new name').where(Major.department == "new Department"))
+    old_m_count = db.session.scalar(sqla.select(db.func.count()).where(Major.name == 'test').where(Major.department == "Testing Department"))
+
+    all_majors = db.session.scalars(sqla.select(Major)).all()
+    assert len(all_majors) == 1
+    assert old_m_count == 0
+    assert m.get_name() == 'new name'
+    assert m_count == 1
+
+    do_logout(test_client, path = '/user/logout')
+
+    # student login
+    login_student(test_client)
+    
+    response = test_client.get('/faculty/majors/1/edit', follow_redirects=True)
+    assert response.status_code == 403
+    do_logout(test_client, path = '/user/logout')
+
+
+
+
+
+def test_delete_major(test_client,init_database):
+ #first login
+    login_faculty(test_client)
+
+   
+    #get the major  
+    response = test_client.get('/faculty/majors')
+    assert response.status_code == 200
+    assert b"Computer Science" in response.data
+    assert b"CS Dept" in response.data
+
+    #delete the major
+    response = test_client.post('/faculty/majors/1/delete', follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Major deleted." in response.data
+
+
+
+    m  = db.session.scalars(sqla.select(Major).where(Major.name == 'test').where(Major.department == "Testing Department")).first()
+    m_count = db.session.scalar(sqla.select(db.func.count()).where(Major.name == 'test').where(Major.department == "Testing Department"))
+    all_majors = db.session.scalars(sqla.select(Major)).all()
+
+    assert len(all_majors) == 0
+    assert m is None
+    assert m_count == 0
+
+    do_logout(test_client, path = '/user/logout')
+
+    # student login
+    login_student(test_client)
+    
+    response = test_client.get('/faculty/majors/1/edit', follow_redirects=True)
+    assert response.status_code == 403
+    do_logout(test_client, path = '/user/logout')
+
+
+
+def test_list_topics(test_client,init_database):
+
+    # faculty login
+    login_faculty(test_client)
+
+    response = test_client.get('/faculty/topics', follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Research Topics" in response.data
+    do_logout(test_client, path = '/user/logout')
+
+    # student login
+    login_student(test_client)
+
+    response = test_client.get('/faculty/topics', follow_redirects=True)
+    assert response.status_code == 403
+    do_logout(test_client, path = '/user/logout')
+
+

@@ -219,6 +219,8 @@ def view_one_applicant(applicant_id):
     application = db.session.scalars(sqla.select(Application).where(Application.student_id == applicant_id)).first()
     return render_template('view_one_applicant.html', student=student, application=application, faculty = current_user)
 
+
+
 @bp_faculty.route('/application/<int:app_id>/update', methods=['POST'])
 @login_required
 def update_application_status(app_id):
@@ -317,7 +319,6 @@ def list_topics():
         sqla.select(ResearchTopic).order_by(ResearchTopic.name)
     ).all()
     return render_template('topics_list.html', topics=topics, faculty = current_user)
-
 
 @bp_faculty.route('/faculty/topics/create', methods=['GET','POST'])
 @login_required
