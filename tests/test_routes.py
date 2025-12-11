@@ -363,6 +363,7 @@ def test_create_position_post(test_client, init_database):
     ).first()
 
     assert pos is not None
+    do_logout(test_client, path = '/user/logout')
 
 
 def test_create_position_bad_start_date(test_client, init_database):
@@ -380,6 +381,7 @@ def test_create_position_bad_start_date(test_client, init_database):
 
     assert response.status_code == 200
     assert b"Start date cannot be in the past", "danger" in response.data
+    do_logout(test_client, path = '/user/logout')
     
 
 
@@ -392,6 +394,7 @@ def test_edit_position(test_client, init_database):
 
     assert response.status_code == 200
     assert b"Edit Me" in response.data
+    do_logout(test_client, path = '/user/logout')
 
 
 def test_faculty_index(test_client, init_database):
@@ -402,6 +405,7 @@ def test_faculty_index(test_client, init_database):
 
     assert response.status_code == 200
     assert b"Hello Faculty." in response.data
+    do_logout(test_client, path = '/user/logout')
 
 
 def test_faculty_profile(test_client, init_database):
@@ -410,6 +414,7 @@ def test_faculty_profile(test_client, init_database):
     response = test_client.get('/faculty/profile')
 
     assert response.status_code == 200
+    do_logout(test_client, path = '/user/logout')
 
 
 
@@ -525,7 +530,85 @@ def test_list_courses(test_client,init_database):
     response = test_client.get('/faculty/courses', follow_redirects=True)
     assert response.status_code == 403
     do_logout(test_client, path = '/user/logout')
+def test_list_lang(test_client,init_database):
+    #login
+    login_faculty(test_client)
 
+    response = test_client.get('/faculty/languages', follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Programming Languages" in response.data
+    do_logout(test_client, path = '/user/logout')
+
+    # student login
+    login_student(test_client)
+
+    response = test_client.get('/faculty/languages', follow_redirects=True)
+    assert response.status_code == 403
+    do_logout(test_client, path = '/user/logout')
+
+
+def test_create_lang(test_client, init_database):
+    #login
+    login_faculty(test_client)
+
+    #test create_language route
+    response = test_client.get('/faculty/languages/create')
+    assert response.status_code == 200
+    assert b"Programming Language" in response.data #*add what the page returns
+
+    #test creating language
+    response = test_client.post('/faculty/languages/create',
+                                data=dict(name = "Ruby"),
+                                follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Ruby" in response.data
+    l = db.session.scalars(sqla.select(ProgrammingLanguage).where(ProgrammingLanguage.name == "Ruby")).first()
+    lcount = db.session.scalar(sqla.select(db.func.count()).where(ProgrammingLanguage.name == "Ruby"))
+
+    assert l.name == 'Ruby'
+    assert lcount == 1
+    
+    #logout faculty and login student
+    do_logout(test_client, path = '/user/logout')
+    login_student(test_client)
+
+    response = test_client.get('/faculty/languages/create', follow_redirects=True)
+    assert response.status_code == 403
+    do_logout(test_client, path = '/user/logout')
+
+def test_edit_language(test_client, init_database):
+    #login 
+    login_faculty(test_client)
+
+    response = test_client.get('/faculty/languages/1/edit', follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Edit Programming Language" in response.data 
+    assert b"Python" in response.data
+
+    #Edit Values
+    response = test_client.post('/faculty/languages/1/edit', 
+                          data=dict(name = 'new lang'),  
+                          follow_redirects = True)
+    assert response.status_code == 200
+    assert b"new lang" in response.data
+    l  = db.session.scalars(sqla.select(ProgrammingLanguage).where(ProgrammingLanguage.name == 'new lang')).first()
+    lcount = db.session.scalar(sqla.select(db.func.count()).where(ProgrammingLanguage.name == 'new lang'))
+    old_lcount = db.session.scalar(sqla.select(db.func.count()).where(ProgrammingLanguage.name == 'Python'))
+
+    all_langs = db.session.scalars(sqla.select(ProgrammingLanguage)).all() 
+    assert len(all_langs) == 1
+    assert old_lcount == 0
+    assert l.name == 'new lang'
+    assert lcount == 1
+
+    do_logout(test_client, path = '/user/logout')
+
+    # student login
+    login_student(test_client)
+    
+    response = test_client.get('/faculty/languages/1/edit', follow_redirects=True)
+    assert response.status_code == 403
+    do_logout(test_client, path = '/user/logout')
 
 def test_create_course(test_client, init_database):
     #login
@@ -611,83 +694,5 @@ def test_edit_courses(test_client, init_database):
     assert response.status_code == 403
     do_logout(test_client, path = '/user/logout')
 
-def test_list_lang(test_client,init_database):
-    #login
-    login_faculty(test_client)
 
-    response = test_client.get('/faculty/languages', follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Programming Languages" in response.data
-    do_logout(test_client, path = '/user/logout')
-
-    # student login
-    login_student(test_client)
-
-    response = test_client.get('/faculty/languages', follow_redirects=True)
-    assert response.status_code == 403
-    do_logout(test_client, path = '/user/logout')
-
-
-def test_create_lang(test_client, init_database):
-    #login
-    login_faculty(test_client)
-
-    #test create_language route
-    response = test_client.get('/faculty/languages/create')
-    assert response.status_code == 200
-    assert b"Programming Language" in response.data #*add what the page returns
-
-    #test creating language
-    response = test_client.post('/faculty/languages/create',
-                                data=dict(name = "Ruby"),
-                                follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Ruby" in response.data
-    l = db.session.scalars(sqla.select(ProgrammingLanguage).where(ProgrammingLanguage.name == "Ruby")).first()
-    lcount = db.session.scalar(sqla.select(db.func.count()).where(ProgrammingLanguage.name == "Ruby"))
-
-    assert l.name == 'Ruby'
-    assert lcount == 1
-    
-    #logout faculty and login student
-    do_logout(test_client, path = '/user/logout')
-    login_student(test_client)
-
-    response = test_client.get('/faculty/languages/create', follow_redirects=True)
-    assert response.status_code == 403
-    do_logout(test_client, path = '/user/logout')
-
-def test_edit_language(test_client, init_database):
-    #login 
-    login_faculty(test_client)
-
-    response = test_client.get('/faculty/languages/1/edit', follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Edit Programming Language" in response.data 
-    assert b"Python" in response.data
-
-    #Edit Values
-    response = test_client.post('/faculty/languages/1/edit', 
-                          data=dict(name = 'new lang'),  
-                          follow_redirects = True)
-    assert response.status_code == 200
-    assert b"new lang" in response.data
-    l  = db.session.scalars(sqla.select(ProgrammingLanguage).where(ProgrammingLanguage.name == 'new lang')).first()
-    lcount = db.session.scalar(sqla.select(db.func.count()).where(ProgrammingLanguage.name == 'new lang'))
-    old_lcount = db.session.scalar(sqla.select(db.func.count()).where(ProgrammingLanguage.name == 'Python'))
-
-    all_langs = db.session.scalars(sqla.select(ProgrammingLanguage)).all() 
-    assert len(all_langs) == 1
-    assert old_lcount == 0
-    assert l.name == 'new lang'
-    assert lcount == 1
-
-    do_logout(test_client, path = '/user/logout')
-
-    # student login
-    login_student(test_client)
-    
-    response = test_client.get('/faculty/languages/1/edit', follow_redirects=True)
-    assert response.status_code == 403
-    do_logout(test_client, path = '/user/logout')
 
