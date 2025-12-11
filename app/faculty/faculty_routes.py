@@ -253,17 +253,18 @@ def view_applicants(position_id):
     return render_template('view_applicants.html', applications=all_applications, faculty = current_user)
 
 
-@bp_faculty.route('/position/<int:applicant_id>/', methods=['GET', 'POST'])
+@bp_faculty.route('/position/<int:applicantion_id>/', methods=['GET', 'POST'])
 @login_required
-def view_one_applicant(applicant_id):
+def view_one_applicantion(applicantion_id):
     
     # Must be a faculty member
     if not current_user.user_type == 'Faculty':
         abort(403)
 
-    student = db.session.scalars(sqla.select(Student).where(Student.id == applicant_id)).first()
-    application = db.session.scalars(sqla.select(Application).where(Application.student_id == applicant_id)).first()
-    return render_template('view_one_applicant.html', student=student, application=application, faculty = current_user)
+    application = db.session.scalars(sqla.select(Application).where(Application.id == applicantion_id)).first()
+    student = db.session.scalars(sqla.select(Student).where(Student.id == application.student_id)).first()
+
+    return render_template('view_one_applicantion.html', student=student, application=application, faculty = current_user)
 
 
 
@@ -290,7 +291,7 @@ def update_application_status(app_id):
 
         if accepted_count >= position.team_size:
             flash("You cannot accept this student — team size limit reached.", "warning")
-            return redirect(url_for('faculty.view_one_applicant', applicant_id=app.student_id))
+            return redirect(url_for('faculty.view_one_applicantion', applicantion_id=app.id))
 
         app.status = "Accepted"
         flash("Application accepted")
@@ -300,7 +301,7 @@ def update_application_status(app_id):
         flash("Application rejected")
 
     db.session.commit()
-    return redirect(url_for('faculty.view_applicants', position_id=app.id, faculty = current_user))
+    return redirect(url_for('faculty.view_applicants', position_id=position.id, faculty = current_user))
 
 
 
