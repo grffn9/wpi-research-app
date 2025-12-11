@@ -5,6 +5,7 @@ Resources:
     https://flask.palletsprojects.com/en/1.1.x/testing/ 
     https://www.patricksoftwareblog.com/testing-a-flask-application-using-pytest/ 
 """
+from turtle import pos
 import pytest
 from app import create_app, db
 from app.models.models import User, Student, Faculty, ResearchPosition, Application, Major, ResearchTopic, ProgrammingLanguage, Course, Instructor, Grade, StudentCourse
@@ -379,6 +380,7 @@ def test_create_position_bad_start_date(test_client, init_database):
 
     assert response.status_code == 200
     assert b"Start date cannot be in the past", "danger" in response.data
+    
 
 
 def test_edit_position(test_client, init_database):
@@ -411,72 +413,100 @@ def test_faculty_profile(test_client, init_database):
 
 
 
-# def test_view_applicants(test_client, init_database):
-#     faculty = login_faculty(test_client)
+def test_view_applicants(test_client, init_database):
+    faculty = login_faculty(test_client)
 
-#     pos = ResearchPosition(
-#         title='Applicants',
-#         description='Test',
-#         start_date=date.today(),
-#         end_date=date.today() + timedelta(days=1),
-#         team_size=1,
-#         min_gpa=0.0,
-#         reference_required=False,
-#         faculty=faculty
-#     )
-#     db.session.add(pos)
-#     db.session.commit()
+    pos = ResearchPosition(
+        title='Applicants',
+        description='Test',
+        start_date=date.today(),
+        end_date=date.today() + timedelta(days=1),
+        team_size=1,
+        min_gpa=0.0,
+        reference_required=False,         
+        faculty = db.session.scalars(
+        sqla.select(Faculty).where(Faculty.email == 'faculty1@wpi.edu')
+        ).first()
+    )
+    
+    db.session.add(pos)
+    db.session.commit()
 
-#     response = test_client.get(f'/position/{pos.id}/applicants')
+    response = test_client.get(f'/position/{pos.id}/applicants')
 
-#     assert response.status_code == 200
-
-
-
-# def test_update_application_status(test_client, init_database):
-#     faculty = login_faculty(test_client)
-#     sqla.select(Faculty).where(Faculty.username == 'faculty')
+    assert response.status_code == 200
+    do_logout(test_client, path = '/user/logout')
 
 
-# #     student = Student(
-# #     username="student2",
-# #     email="s1@wpi.edu",
-# #     firstname="Stu",
-# #     lastname="Dent",
-# #     wpi_id=999999999
-# # )
-# #     student.set_password("1234")
-# #     db.session.add(student)
-# #     db.session.commit()
 
-# #     position = ResearchPosition(
-# #         title="Applicants",
-# #         description="test",
-# #         start_date=date.today(),
-# #         end_date=date.today() + timedelta(days=1),
-# #         team_size=1,
-# #         min_gpa=0.0,
-# #         reference_required=False,
-# #         faculty=faculty
-# #     )
-# #     db.session.add(position)
-# #     db.session.commit()
 
-# #     app_obj = Application(
-# #         student_id=student.id,
-# #         position_id=position.id,
-# #         reference_id=faculty.id,
-# #         reference_status='Pending',
-# #         statement="test statement"
-# #     )
-# #     db.session.add(app_obj)
-# #     db.session.commit()
+def test_update_application_status(test_client, init_database):
+    login_faculty(test_client)
 
-# #     response = test_client.post(
-# #         f'/faculty/{app_obj.id}/recommend',
-# #         data=dict(rec_status='Approved'),
-# #         follow_redirects=True
-# #     )
+    sqla.select(Faculty).where(Faculty.username == 'faculty')
 
-# #     assert response.status_code == 200
+    faculty = db.session.scalars(
+        sqla.select(Faculty).where(Faculty.email == 'faculty1@wpi.edu')
+    ).first()
+    do_logout(test_client, path = '/user/logout')
+
+    login_student(test_client)
+    student = Student(
+        username="student2",
+        email="s1@wpi.edu",
+        firstname="Stu",
+        lastname="Dent",
+        wpi_id=999999999
+    )
+    student.set_password("1234")
+    db.session.add(student)
+    db.session.commit()
+    do_logout(test_client, path = '/user/logout')
+
+    login_faculty(test_client)
+
+    position = ResearchPosition(
+        title="Applicants",
+        description="test",
+        start_date=date.today(),
+        end_date=date.today() + timedelta(days=1),
+        team_size=1,
+        min_gpa=0.0,
+        reference_required=False,
+        faculty=faculty
+    )
+
+    
+
+    position = ResearchPosition(
+        title="Applicants",
+        description="test",
+        start_date=date.today(),
+        end_date=date.today() + timedelta(days=1),
+        team_size=1,
+        min_gpa=0.0,
+        reference_required=False,
+        faculty=faculty
+    )
+    db.session.add(position)
+    db.session.commit()
+
+    app_obj = Application(
+        student_id=student.id,
+        position_id=position.id,
+        reference_id=faculty.id,
+        reference_status='Pending',
+        statement="test statement"
+    )
+    db.session.add(app_obj)
+    db.session.commit()
+
+    response = test_client.post(
+        f'/faculty/{app_obj.id}/recommend',
+        data=dict(rec_status='Approved'),
+        follow_redirects=True
+    )
+
+    assert response.status_code == 200
+    do_logout(test_client, path = '/user/logout')
 
