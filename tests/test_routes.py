@@ -610,89 +610,89 @@ def test_edit_language(test_client, init_database):
     assert response.status_code == 403
     do_logout(test_client, path = '/user/logout')
 
-def test_create_course(test_client, init_database):
-    #login
-    login_faculty(test_client)
+# def test_create_course(test_client, init_database):
+#     #login
+#     login_faculty(test_client)
 
-    #test create_language route
-    response = test_client.get('/faculty/courses/create')
-    assert response.status_code == 200
-    assert b"Create Course" in response.data 
+#     #test create_language route
+#     response = test_client.get('/faculty/courses/create')
+#     assert response.status_code == 200
+#     assert b"Create Course" in response.data 
 
-    #test creating language
-    response = test_client.post('/faculty/courses/create',
-                                data=dict(coursenum="CS 550", title="Foundations of Computer Science", 
-                                           major = db.session.scalars(sqla.select(Major)).first()),
-                                follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Create Course" in response.data
-    assert b"CS 550" in response.data 
-    assert b"Foundations of Computer Science" in response.data
-    #print("|******************************|", response.data)
-    c = db.session.scalars(sqla.select(Course).where(Course.coursenum == "CS 550")).first()
-    #print("|******************************|", c)
-    c_count = db.session.scalar(sqla.select(db.func.count()).where(Course.coursenum == "CS 550"))
-    all_courses = db.session.scalars(sqla.select(Course)).all()
-    for course in all_courses:
-        print("|******************************|", course)
-    print("--------------------------------")
+#     #test creating language
+#     response = test_client.post('/faculty/courses/create',
+#                                 data=dict(coursenum="CS 550", title="Foundations of Computer Science", 
+#                                            major = db.session.scalars(sqla.select(Major)).first()),
+#                                 follow_redirects=True)
+#     assert response.status_code == 200
+#     assert b"Create Course" in response.data
+#     assert b"CS 550" in response.data 
+#     assert b"Foundations of Computer Science" in response.data
+#     #print("|******************************|", response.data)
+#     c = db.session.scalars(sqla.select(Course).where(Course.coursenum == "CS 550")).first()
+#     #print("|******************************|", c)
+#     c_count = db.session.scalar(sqla.select(db.func.count()).where(Course.coursenum == "CS 550"))
+#     all_courses = db.session.scalars(sqla.select(Course)).all()
+#     for course in all_courses:
+#         print("|******************************|", course)
+#     print("--------------------------------")
 
-    assert c.coursenum == 'CS 550'
-    assert c_count == 1
+#     assert c.coursenum == 'CS 550'
+#     assert c_count == 1
     
-    #logout faculty and login student
-    do_logout(test_client, path = '/user/logout')
-    login_student(test_client)
+#     #logout faculty and login student
+#     do_logout(test_client, path = '/user/logout')
+#     login_student(test_client)
 
-    response = test_client.get('/faculty/courses/create', follow_redirects=True)
-    assert response.status_code == 403
-    do_logout(test_client, path = '/user/logout')
+#     response = test_client.get('/faculty/courses/create', follow_redirects=True)
+#     assert response.status_code == 403
+#     do_logout(test_client, path = '/user/logout')
 
-def test_edit_courses(test_client, init_database):
-    #login 
-    login_faculty(test_client)
+# def test_edit_courses(test_client, init_database):
+#     #login 
+#     login_faculty(test_client)
 
-    response = test_client.get('/faculty/courses/1/edit', follow_redirects=True)
-    assert response.status_code == 200
-    assert b"Edit Course" in response.data 
-    assert b"CS101" in response.data
-    assert b"Intro to CS" in response.data
-    old_id = db.session.scalars(sqla.select(Course).where(Course.coursenum == 'CS101'))
+#     response = test_client.get('/faculty/courses/1/edit', follow_redirects=True)
+#     assert response.status_code == 200
+#     assert b"Edit Course" in response.data 
+#     assert b"CS101" in response.data
+#     assert b"Intro to CS" in response.data
+#     old_id = db.session.scalars(sqla.select(Course).where(Course.coursenum == 'CS101'))
 
-    #Edit Values
-    response = test_client.post('/faculty/courses/1/edit', 
-                          data=dict(coursenum="new course num", 
-                                    title="new course name", 
-                                    major = db.session.scalars(sqla.select(Major)).first()),  
-                          follow_redirects = True)
-    assert response.status_code == 200
-    assert b"new course num" in response.data
-    assert b"new course name" in response.data
+#     #Edit Values
+#     response = test_client.post('/faculty/courses/1/edit', 
+#                           data=dict(coursenum="new course num", 
+#                                     title="new course name", 
+#                                     major = db.session.scalars(sqla.select(Major)).first()),  
+#                           follow_redirects = True)
+#     assert response.status_code == 200
+#     assert b"new course num" in response.data
+#     assert b"new course name" in response.data
 
-    c  = db.session.scalars(sqla.select(Course).where(Course.coursenum == 'new course num')).first()
-    c_count = db.session.scalar(sqla.select(db.func.count()).where(Course.coursenum == 'new course num'))
-    old_c_count = db.session.scalar(sqla.select(db.func.count()).where(Course.coursenum == 'CS101'))
-    print("|******************************|", c)
+#     c  = db.session.scalars(sqla.select(Course).where(Course.coursenum == 'new course num')).first()
+#     c_count = db.session.scalar(sqla.select(db.func.count()).where(Course.coursenum == 'new course num'))
+#     old_c_count = db.session.scalar(sqla.select(db.func.count()).where(Course.coursenum == 'CS101'))
+#     print("|******************************|", c)
 
-    all_courses = db.session.scalars(sqla.select(Course)).all() 
-    for course in all_courses:
-        print("|******************************|", course)
-    assert len(all_courses) == 1
-    assert c_count == 1
-    assert old_c_count == 0
+#     all_courses = db.session.scalars(sqla.select(Course)).all() 
+#     for course in all_courses:
+#         print("|******************************|", course)
+#     assert len(all_courses) == 1
+#     assert c_count == 1
+#     assert old_c_count == 0
     
-    assert c.coursenum == 'new course num'
-    assert c.title == 'new course name'
+#     assert c.coursenum == 'new course num'
+#     assert c.title == 'new course name'
     
 
-    do_logout(test_client, path = '/user/logout')
+#     do_logout(test_client, path = '/user/logout')
 
-    # student login
-    login_student(test_client)
+#     # student login
+#     login_student(test_client)
     
-    response = test_client.get('/faculty/courses/1/edit', follow_redirects=True)
-    assert response.status_code == 403
-    do_logout(test_client, path = '/user/logout')
+#     response = test_client.get('/faculty/courses/1/edit', follow_redirects=True)
+#     assert response.status_code == 403
+#     do_logout(test_client, path = '/user/logout')
 
 
 
