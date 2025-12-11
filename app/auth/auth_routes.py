@@ -1,6 +1,7 @@
 
 from flask_mail import Message
 from flask import render_template, flash, redirect, request, url_for
+import requests
 
 from app import db, mail
 from app.auth import auth_blueprint as bp_auth 
@@ -191,5 +192,88 @@ def logout():
     #choose the correct user
     return redirect(url_for('auth.login'))
 
+@bp_auth.route("/sso/login")
+def sso_login():
+    params = {
+        "response_type": "code",
+        "client_id": current_app.config["AUTH0_CLIENT_ID"],
+        "redirect_uri": current_app.config["AUTH0_REDIRECT_URI"],
+        "scope": "openid profile email",
+        "prompt": "login",
+    }
+
+    auth_url = (
+        f"https://{current_app.config['AUTH0_DOMAIN']}/authorize?"
+        + "&".join(f"{k}={v}" for k, v in params.items())
+    )
+
+    return redirect(auth_url)
 
 
+
+@bp_auth.route("/sso/callback")
+def sso_callback():
+    code = request.args.get("code")
+    if not code:
+        flash("SSO login failed.", "danger")
+        return redirect(url_for("auth.login"))
+
+    token_url = f"https://{current_app.config['AUTH0_DOMAIN']}/oauth/token"
+
+    token_payload = {
+        "grant_type": "authorization_code",
+        "client_id": current_app.config["AUTH0_CLIENT_ID"],
+        "client_secret": current_app.config["AUTH0_CLIENT_SECRET"],
+        "code": code,
+        "redirect_uri": current_app.config["AUTH0_REDIRECT_URI"],
+    }
+
+    token_resp = requests.post(token_url, json=token_payload)
+    token_data = token_resp.json()
+
+    access_token = token_data.get("access_token")
+    if not access_token:
+        flash("SSO token exchange failed.", "danger")
+        return redirect(url_for("auth.login"))
+
+    userinfo_resp = requests.get(
+        f"https://{current_app.config['AUTH0_DOMAIN']}/userinfo",
+        headers={"Authorization": f"Bearer {access_token}"}
+    )
+
+    userinfo = userinfo_resp.json()
+    email = userinfo.get("email")
+    first = userinfo.get("given_name", "")
+    last = userinfo.get("family_name", "")
+
+    if not email:
+        flash("SSO login failed: no email.", "danger")
+        return redirect(url_for("auth.login"))
+
+    # Existing user?
+    user = db.session.scalar(sqla.select(User).where(User.email == email))
+
+    if user:
+        login_user(user)
+        return redirect(
+            url_for("faculty.index") if user.user_type == "Faculty"
+            else url_for("student.index")
+        )
+
+    # Auto-create
+    faculty_domain = current_app.config.get("FACULTY_EMAIL_DOMAIN", "@wpi.edu")
+
+    if email.endswith(faculty_domain):
+        new_user = Faculty(email=email, firstname=first, lastname=last, is_verified=True)
+    else:
+        from app.models.models import Student
+        new_user = Student(email=email, firstname=first, lastname=last)
+
+    db.session.add(new_user)
+    db.session.commit()
+    login_user(new_user)
+
+    return redirect(
+        url_for("faculty.index") if new_user.user_type == "Faculty"
+        else url_for("student.index")
+    )

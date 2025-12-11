@@ -2,18 +2,38 @@
 {% import 'bootstrap_wtf.html' as wtf %}
 
 {% block content %}
-    <h1>Sign In</h1>
-<form action="" method="POST">
-    {{ form.hidden_tag()}}
-    
-        <div style="max-width: 600px;">{{wtf.form_field(form.email)}}</div>
-        <div style="max-width: 600px;">{{wtf.form_field(form.password)}}</div>
-        {{wtf.form_field(form.remember_me)}}
-        {{wtf.form_field(form.submit)}}
+<h1>Sign In</h1>
 
-        
-    </form>
-    <p>New User? <a href="{{url_for('auth.SelectFaculty')}}">Register as Faculty</a> or <a href="{{url_for('auth.register_student')}}">Register as Student</a></p>
+<form action="" method="POST">
+    {{ form.hidden_tag() }}
+
+    <div style="max-width: 600px;">
+        {{ wtf.form_field(form.email) }}
+    </div>
+
+    <div style="max-width: 600px;">
+        {{ wtf.form_field(form.password) }}
+    </div>
+
+    {{ wtf.form_field(form.remember_me) }}
+    {{ wtf.form_field(form.submit) }}
+</form>
+
+<!-- SSO SECTION -->
+<hr style="max-width: 600px; margin: 30px 0;">
+
+<div style="max-width: 600px;">
+    <a href="{{ url_for('auth.sso_login') }}"
+       class="btn btn-outline-primary w-100">
+        Sign in with WPI SSO
+    </a>
+</div>
+
+<p style="margin-top: 20px;">
+    New User?
+    <a href="{{ url_for('auth.SelectFaculty') }}">Register as Faculty</a>
+    or
+    <a href="{{ url_for('auth.register_student') }}">Register as Student</a>
+</p>
 
 {% endblock %}
-

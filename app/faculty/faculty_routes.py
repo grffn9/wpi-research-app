@@ -31,6 +31,11 @@ def create_position():
     form.required_courses.choices = [
         (c.id, f"{c.coursenum} — {c.title}") for c in Course.query.order_by(Course.coursenum)]
     
+    if form.start_date.data and form.end_date.data:
+            if form.end_date.data < form.start_date.data:
+                flash("End date cannot be earlier than the start date.", "danger")
+                return render_template("create_research_project.html", form=form, faculty=current_user)
+    
     if form.validate_on_submit():
         
 
@@ -42,10 +47,6 @@ def create_position():
             flash("Start date cannot be earlier than today's date.", "danger")
             return render_template("create_research_project.html", form=form, faculty=current_user)
 
-        if form.start_date.data and form.end_date.data:
-            if form.end_date.data < form.start_date.data:
-                flash("End date cannot be earlier than the start date.", "danger")
-                return render_template("create_research_project.html", form=form, faculty=current_user)
         
         
         # Create position
@@ -141,30 +142,51 @@ def edit_position(position_id):
         if position.end_date:
             form.end_date.data = position.end_date
 
+    if form.start_date.data and form.end_date.data:
+            if form.end_date.data < form.start_date.data:
+                flash("End date cannot be earlier than the start date.", "danger")
+                return render_template("edit_position.html", form=form, position=position, faculty=current_user)
+
     if form.validate_on_submit():
+
+        from datetime import date
+
+        today = date.today()
+
+        if form.start_date.data < today:
+            flash("Start date cannot be earlier than today's date.", "danger")
+            return render_template("edit_position.html", form=form, position=position, faculty=current_user)
 
         # Update simple fields
         position.title = form.title.data
         position.description = form.description.data
-        position.required_qualifications = form.required_qualifications.data
-        position.preferred_qualifications = form.preferred_qualifications.data
-        position.num_positions = form.num_positions.data
+        position.start_date = form.start_date.data
+        position.end_date = form.end_date.data
+        position.team_size = form.team_size.data
+        position.min_gpa = form.min_gpa.data
+        position.reference_required = form.reference_required.data
 
-        # Update deadline
-        position.end_date = None
-        if form.end_date.data:
-            position.end_date = form.end_date.data
-
-        # Clear and replace many-to-many
-        position.majors    = Major.query.filter(Major.id.in_(form.majors.data)).all()
-        position.topics    = ResearchTopic.query.filter(ResearchTopic.id.in_(form.topics.data)).all()
-        position.languages = ProgrammingLanguage.query.filter(ProgrammingLanguage.id.in_(form.languages.data)).all()
-        position.courses   = Course.query.filter(Course.id.in_(form.courses.data)).all()
+        # Update many-to-many relationships
+        if form.preferred_majors.data:
+            major_ids = [m.id if hasattr(m, "id") else int(m) for m in form.preferred_majors.data]
+            position.preferred_majors = Major.query.filter(Major.id.in_(major_ids)).all()
+        
+        if form.research_topics.data:
+            topic_ids = [t.id if hasattr(t, "id") else int(t) for t in form.research_topics.data]
+            position.research_topics = ResearchTopic.query.filter(ResearchTopic.id.in_(topic_ids)).all()
+        
+        if form.programming_languages.data:
+            lang_ids = [l.id if hasattr(l, "id") else int(l) for l in form.programming_languages.data]
+            position.programming_languages = ProgrammingLanguage.query.filter(ProgrammingLanguage.id.in_(lang_ids)).all()
+        
+        if form.required_courses.data:
+            course_ids = [c.id if hasattr(c, "id") else int(c) for c in form.required_courses.data]
+            position.required_courses = Course.query.filter(Course.id.in_(course_ids)).all()
 
         db.session.commit()
 
         flash("Position updated!", "success")
-        return redirect(url_for("faculty.faculty_index"))
+        return redirect(url_for("faculty.index"))
 
     return render_template("edit_position.html", form=form, position=position, faculty = current_user)
 
