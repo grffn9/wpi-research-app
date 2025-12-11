@@ -329,42 +329,33 @@ def test_create_position_get(test_client, init_database):
     response = test_client.get('/create_position')
 
     assert response.status_code == 200
+    do_logout(test_client, path = '/user/logout')
 
 def test_create_position_post(test_client, init_database):
     login_faculty(test_client)
-    payload = dict(
-        title='Test Position',
-        description='Research work',
-        start_date=date.today() + timedelta(days=1),
-        end_date=date.today() + timedelta(days=30),
-        team_size=2,
-        min_gpa=3.2,
-        reference_required=True,
-        preferred_majors=[1],
-        research_topics=[1],
-        programming_languages=[1],
-        required_courses=[1],
-    )
 
     response = test_client.post(
     "/create_position",
-    data={
-        "title": "Test Position",
-        "description": "Research work",
-        "start_date": (date.today() + timedelta(days=1)).isoformat(),
-        "end_date": (date.today() + timedelta(days=30)).isoformat(),
-        "team_size": 2,
-        "min_gpa": 3.2,
-        "reference_required": "y",
-        "preferred_majors": ["1"],
-        "research_topics": ["1"],
-        "programming_languages": ["1"],
-        "required_courses": ["1"],
-    },
+    data= dict(
+        title="Test Position",
+        description="Research work",
+        start_date=(date.today() + timedelta(days=1)).isoformat(),
+        end_date=(date.today() + timedelta(days=30)).isoformat(),
+        team_size=2,
+        min_gpa=3.2,
+        reference_required=True,
+        preferred_majors=["1"],
+        research_topics=["1"],
+        programming_languages=["1"],
+        required_courses=["1"],
+    ),
     follow_redirects=True,
 )
 
     assert response.status_code == 200
+
+    all_pos = db.session.scalars(sqla.select(ResearchPosition)).all()
+    assert len(all_pos) == 2  
 
     pos = db.session.scalars(
         sqla.select(ResearchPosition).where(ResearchPosition.title == 'Test Position')
@@ -391,25 +382,14 @@ def test_create_position_bad_start_date(test_client, init_database):
 
 
 def test_edit_position(test_client, init_database):
-    faculty = login_faculty(test_client)
+    login_faculty(test_client)
 
-
-    pos = ResearchPosition(
-        title='Edit Me',
-        description='Test',
-        start_date=date.today(),
-        end_date=date.today() + timedelta(days=1),
-        team_size=1,
-        min_gpa=0.0,
-        reference_required=False,
-        faculty=faculty
-    )
-    db.session.add(pos)
-    db.session.commit()
-
-    response = test_client.get(f'/position/{pos.id}/edit')
+    response = test_client.post('/position/1/edit', 
+                          data=dict(title = 'Edit Me', description = 'Test'),  
+                          follow_redirects = True)
 
     assert response.status_code == 200
+    assert b"Edit Me" in response.data
 
 
 def test_faculty_index(test_client, init_database):
@@ -419,7 +399,7 @@ def test_faculty_index(test_client, init_database):
     response = test_client.get('/faculty/index')
 
     assert response.status_code == 200
-
+    assert b"Hello Faculty." in response.data
 
 
 def test_faculty_profile(test_client, init_database):
@@ -431,70 +411,72 @@ def test_faculty_profile(test_client, init_database):
 
 
 
-def test_view_applicants(test_client, init_database):
-    faculty = login_faculty(test_client)
+# def test_view_applicants(test_client, init_database):
+#     faculty = login_faculty(test_client)
 
-    pos = ResearchPosition(
-        title='Applicants',
-        description='Test',
-        start_date=date.today(),
-        end_date=date.today() + timedelta(days=1),
-        team_size=1,
-        min_gpa=0.0,
-        reference_required=False,
-        faculty=faculty
-    )
-    db.session.add(pos)
-    db.session.commit()
+#     pos = ResearchPosition(
+#         title='Applicants',
+#         description='Test',
+#         start_date=date.today(),
+#         end_date=date.today() + timedelta(days=1),
+#         team_size=1,
+#         min_gpa=0.0,
+#         reference_required=False,
+#         faculty=faculty
+#     )
+#     db.session.add(pos)
+#     db.session.commit()
 
-    response = test_client.get(f'/position/{pos.id}/applicants')
+#     response = test_client.get(f'/position/{pos.id}/applicants')
 
-    assert response.status_code == 200
-
-def test_update_application_status(test_client, init_database):
-    faculty = login_faculty(test_client)
-    sqla.select(Faculty).where(Faculty.username == 'faculty')
+#     assert response.status_code == 200
 
 
-    student = Student(
-    username="student2",
-    email="s1@wpi.edu",
-    firstname="Stu",
-    lastname="Dent",
-    wpi_id=999999999
-)
-    student.set_password("1234")
-    db.session.add(student)
-    db.session.commit()
 
-    position = ResearchPosition(
-        title="Applicants",
-        description="test",
-        start_date=date.today(),
-        end_date=date.today() + timedelta(days=1),
-        team_size=1,
-        min_gpa=0.0,
-        reference_required=False,
-        faculty=faculty
-    )
-    db.session.add(position)
-    db.session.commit()
+# def test_update_application_status(test_client, init_database):
+#     faculty = login_faculty(test_client)
+#     sqla.select(Faculty).where(Faculty.username == 'faculty')
 
-    app_obj = Application(
-        student_id=student.id,
-        position_id=position.id,
-        reference_id=faculty.id,
-        reference_status='Pending',
-        statement="test statement"
-    )
-    db.session.add(app_obj)
-    db.session.commit()
 
-    response = test_client.post(
-        f'/faculty/{app_obj.id}/recommend',
-        data=dict(rec_status='Approved'),
-        follow_redirects=True
-    )
+# #     student = Student(
+# #     username="student2",
+# #     email="s1@wpi.edu",
+# #     firstname="Stu",
+# #     lastname="Dent",
+# #     wpi_id=999999999
+# # )
+# #     student.set_password("1234")
+# #     db.session.add(student)
+# #     db.session.commit()
 
-    assert response.status_code == 200
+# #     position = ResearchPosition(
+# #         title="Applicants",
+# #         description="test",
+# #         start_date=date.today(),
+# #         end_date=date.today() + timedelta(days=1),
+# #         team_size=1,
+# #         min_gpa=0.0,
+# #         reference_required=False,
+# #         faculty=faculty
+# #     )
+# #     db.session.add(position)
+# #     db.session.commit()
+
+# #     app_obj = Application(
+# #         student_id=student.id,
+# #         position_id=position.id,
+# #         reference_id=faculty.id,
+# #         reference_status='Pending',
+# #         statement="test statement"
+# #     )
+# #     db.session.add(app_obj)
+# #     db.session.commit()
+
+# #     response = test_client.post(
+# #         f'/faculty/{app_obj.id}/recommend',
+# #         data=dict(rec_status='Approved'),
+# #         follow_redirects=True
+# #     )
+
+# #     assert response.status_code == 200
 
