@@ -5,12 +5,12 @@ Resources:
     https://flask.palletsprojects.com/en/1.1.x/testing/ 
     https://www.patricksoftwareblog.com/testing-a-flask-application-using-pytest/ 
 """
-import os
 import pytest
 from app import create_app, db
-from app.models.models import *
+from app.models.models import User, Student, Faculty, ResearchPosition, Application, Major, ResearchTopic, ProgrammingLanguage, Course, Instructor, Grade, StudentCourse
 from config import Config
 import sqlalchemy as sqla
+from datetime import datetime, date
 
 
 class TestConfig(Config):
@@ -20,188 +20,171 @@ class TestConfig(Config):
     DEBUG = True
     TESTING = True
 
-
 @pytest.fixture(scope='module')
 def test_client():
-    # create the flask application ; configure the app for tests
     flask_app = create_app(config_class=TestConfig)
-
-    # Flask provides a way to test your application by exposing the Werkzeug test Client
-    # and handling the context locals for you.
     testing_client = flask_app.test_client()
- 
-    # Establish an application context before running the tests.
     ctx = flask_app.app_context()
     ctx.push()
- 
-    yield  testing_client 
-    # this is where the testing happens!
- 
+    yield testing_client
     ctx.pop()
-
-def new_user(uname, uemail,passwd):
-    user = User(username=uname, firstname="test", lastname="test", email=uemail)
-    user.set_password(passwd)
-    return user
-
-def new_faculty(uname, uemail,passwd):
-    faculty = Faculty(username=uname, firstname="test", lastname="test", email=uemail, is_verified=True)
-    faculty.set_password(passwd)
-    return faculty
-
-def new_student(uname, uemail,passwd):
-    student = Student(username=uname, firstname="test", lastname="test", email=uemail, wpi_id="123456", gpa=3.5)
-    student.set_password(passwd)
-    return student
-
-# def init_tags():
-#     # check if any tags are already defined in the database
-#     count = db.session.scalar(db.select(db.func.count(Tag.id)))
-#     print("**************", count)
-#     # initialize the tags
-#     if count == 0:
-#         tags = ['funny','inspiring', 'true-story', 'heartwarming', 'friendship']
-#         for t in tags:
-#             db.session.add(Tag(name=t))
-#         db.session.commit()
-#     return None
-
-# def init_faculty():
-#     users = []
-#     faculty_members = [
-#         {'firstname':'John','lastname':'Doe', 'email':'john.doe@example.com', 'is_verified': False},
-#         {'firstname':'Jane','lastname':'Smith','email':'jane.smith@example.com', 'is_verified': False}]
-#     for data in faculty_members:   # fix typo
-#         user = User(
-#             firstname=data["firstname"],
-#             lastname=data["lastname"],
-#             email=data["email"],
-#             is_verified=True,
-#             username=data["firstname"] + data["lastname"]
-#         )
-#         user.set_password("123")  # hash and store password
-#         db.session.add(user)
-#         users.append(user)
-#     db.session.commit()
-#     return users
-
 
 @pytest.fixture
 def init_database():
-    # Create the database and the database table
     db.create_all()
-    #add a user    
-    user1 = new_student(uname='snow', uemail='snow@wpi.edu', passwd='123')
-    user2 = new_faculty(uname='john', uemail='john.doe@example.com', passwd='123')
-
-    # Insert user data
-    db.session.add(user1)
-    db.session.add(user2)
-
-    # Commit the changes for the users
+    
+    m1 = Major(name="Computer Science", department="CS Dept")
+    t1 = ResearchTopic(name="AI")
+    l1 = ProgrammingLanguage(name="Python")
+    c1 = Course(coursenum="CS101", title="Intro to CS", major=m1)
+    i1 = Instructor(name="Prof. Smith")
+    g1 = Grade(value="A")
+    
+    db.session.add_all([m1, t1, l1, c1, i1, g1])
+    db.session.commit()
+    
+    f1 = Faculty(username='faculty1', email='faculty1@wpi.edu', firstname='Fac', lastname='Ulty', is_verified=True)
+    f1.set_password('password')
+    db.session.add(f1)
+    db.session.commit()
+    
+    s1 = Student(username='student1', email='student1@wpi.edu', firstname='Stu', lastname='Dent', wpi_id=123456789)
+    s1.set_password('password')
+    db.session.add(s1)
+    db.session.commit()
+    
+    p1 = ResearchPosition(
+        title="AI Research",
+        description="Doing AI stuff",
+        start_date=date(2024, 1, 1),
+        end_date=date(2024, 5, 1),
+        team_size=2,
+        min_gpa=3.0,
+        faculty_id=f1.id,
+        reference_required=False
+    )
+    db.session.add(p1)
     db.session.commit()
 
-    yield  # this is where the testing happens!
+    yield
 
     db.drop_all()
 
-# def test_register_page(test_client):
-#     """
-#     GIVEN a Flask application configured for testing
-#     WHEN the '/user/register' page is requested (GET)
-#     THEN check that the response is valid
-#     """
-#     # Create a test client using the Flask application configured for testing
-#     response = test_client.get('/user/register')
-#     assert response.status_code == 200
-#     assert b"Register" in response.data
+def login_student(test_client):
+    return test_client.post('/user/login',
+        data=dict(email='student1@wpi.edu', password='password'),
+        follow_redirects=True
+    )
 
-# def test_register(test_client,init_database):
-#     """
-#     GIVEN a Flask application configured for testing
-#     WHEN the '/user/register' form is submitted (POST)
-#     THEN check that the response is valid and the database is updated correctly
-#     """
-#     # Create a test client using the Flask application configured for testing
-#     response = test_client.post('/user/register', 
-#                           data=dict(username='john', email='john@wpi.edu',password="bad-bad-password",password2="bad-bad-password"),
-#                           follow_redirects = True)
-#     assert response.status_code == 200
-    
-#     s = db.session.scalars(sqla.select(User).where(User.username == 'john')).first()
-#     s_count = db.session.scalar(sqla.select(db.func.count()).where(User.username == 'john'))
-    
-#     assert s.email == 'john@wpi.edu'
-#     assert s_count == 1
-#     assert b"Sign In" in response.data   
-#     assert b"Please log in to access this page." in response.data
-
-# def test_invalidlogin(test_client,init_database):
-#     """
-#     GIVEN a Flask application configured for testing
-#     WHEN the '/user/login' form is submitted (POST) with wrong credentials
-#     THEN check that the response is valid and login is refused 
-#     """
-#     response = test_client.post('/user/login', 
-#                           data=dict(username='snow', password='12345',remember_me=False),
-#                           follow_redirects = True)
-#     assert response.status_code == 200
-#     assert b"Invalid username or password" in response.data
-
-# ------------------------------------
-# Helper functions
-
-def do_login_faculty(test_client, path , email, passwd):
-    response = test_client.post(path, 
-                          data=dict(email=email, password=passwd, remember_me=False),
-                          follow_redirects = True)
-    assert response.status_code == 200
-    #Students should update this assertion condition according to their own page content
-    assert b"Hello Faculty." in response.data
-
-def do_login_student(test_client, path , email, passwd):
-    response = test_client.post(path, 
-                          data=dict(email=email, password=passwd, remember_me=False),
-                          follow_redirects = True)
-    assert response.status_code == 200
-    #Students should update this assertion condition according to their own page content
-    assert b"Hello Student." in response.data  
+def login_faculty(test_client):
+    return test_client.post('/user/login',
+        data=dict(email='faculty1@wpi.edu', password='password'),
+        follow_redirects=True
+    )
 
 def do_logout(test_client, path):
     response = test_client.get(path,                       
                           follow_redirects = True)
     assert response.status_code == 200
-    # Assuming the application re-directs to login page after logout.
-    #Students should update this assertion condition according to their own page content 
     assert b"Sign In" in response.data
     assert b"New User?" in response.data    
 
-# ------------------------------------
 
-# def test_login_logout(request,test_client,init_database):
-#     """
-#     GIVEN a Flask application configured for testing
-#     WHEN the '/user/login' form is submitted (POST) with correct credentials
-#     THEN check that the response is valid and login is succesfull 
-#     """
-#     do_login(test_client, path = '/user/login', username = 'snow', passwd = '1234')
+def test_student_index(test_client, init_database):
+    login_student(test_client)
+    response = test_client.get('/student/index')
+    assert response.status_code == 200
+    assert b"AI Research" in response.data
+    do_logout(test_client, path = '/user/logout')
 
-#     do_logout(test_client, path = '/user/logout')
+def test_student_profile(test_client, init_database):
+    login_student(test_client)
+    response = test_client.get('/profile')
+    
+    assert response.status_code == 200
+    assert b"Stu" in response.data 
+    assert b"Dent" in response.data
+    do_logout(test_client, path = '/user/logout')
+
+def test_edit_profile(test_client, init_database):
+    login_student(test_client)
+    
+    response = test_client.get('/edit_profile')
+    assert response.status_code == 200
+    
+    m1 = db.session.scalars(sqla.select(Major)).first()
+    
+    response = test_client.post('/edit_profile', data={
+        'firstname': 'Student',
+        'lastname': 'Updated',
+        'username': 'student1',
+        'email': 'student1@wpi.edu',
+        'wpi_id': 123456789,
+        'gpa': 3.8,
+        'majors': [m1.id],
+    }, follow_redirects=True)
+    
+    assert response.status_code == 200
+    
+    s1 = db.session.scalars(sqla.select(Student).where(Student.username == 'student1')).first()
+    assert s1.lastname == 'Updated'
+    assert s1.gpa == 3.8
+    do_logout(test_client, path = '/user/logout')
 
 
+def test_apply(test_client, init_database):
+    login_student(test_client)
+    p1 = db.session.scalars(sqla.select(ResearchPosition)).first()
+    
+    response = test_client.get(f'/apply/{p1.id}')
+    assert response.status_code == 200
+    
+    response = test_client.post(f'/apply/{p1.id}', data={
+        'statement': 'I am very interested.'
+    }, follow_redirects=True)
+    
+    assert response.status_code == 200
+    assert b"Application submitted successfully!" in response.data
+    
+    app = db.session.scalars(sqla.select(Application)).first()
+    
+    assert app is not None
+    assert app.position_id == p1.id
+    assert app.statement == 'I am very interested.'
+    do_logout(test_client, path = '/user/logout')
 
+
+def test_withdraw_application(test_client, init_database):
+    login_student(test_client)
+    p1 = db.session.scalars(sqla.select(ResearchPosition)).first()
+    s1 = db.session.scalars(sqla.select(Student).where(Student.username == 'student1')).first()
+    
+    app = Application(student_id=s1.id, position_id=p1.id, statement="Test", status='pending')
+    db.session.add(app)
+    db.session.commit()
+    
+    response = test_client.post(f'/withdraw_application/{app.id}', follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Application has been withdrawn." in response.data
+    
+    app_check = db.session.get(Application, app.id)
+    assert app_check is None
+    do_logout(test_client, path = '/user/logout')
+
+    
 def test_list_majors(test_client,init_database):
 
     # faculty login
-    do_login_faculty(test_client, '/user/login', 'john.doe@example.com', '123')
+    login_faculty(test_client)
 
-    response = test_client.get('/faculty/majors', follow_redirects=True)
+        
+    response = test_client.get('/faculty/majors')
     assert response.status_code == 200
     assert b"Majors" in response.data
     do_logout(test_client, path = '/user/logout')
 
     # student login
-    do_login_student(test_client, '/user/login', 'snow@wpi.edu', '123')
+    login_student(test_client)
     
     response = test_client.get('/faculty/majors', follow_redirects=True)
     assert response.status_code == 403
@@ -211,7 +194,7 @@ def test_list_majors(test_client,init_database):
 
 def test_create_major(test_client,init_database):
  #first login
-    do_login_faculty(test_client, '/user/login', 'john.doe@example.com', '123')
+    login_faculty(test_client)
     
     #test the create major form 
     response = test_client.get('/faculty/majors/create')
@@ -235,7 +218,7 @@ def test_create_major(test_client,init_database):
     do_logout(test_client, path = '/user/logout')
 
     # student login
-    do_login_student(test_client, '/user/login', 'snow@wpi.edu', '123')
+    login_student(test_client)
     
     response = test_client.get('/faculty/majors/create', follow_redirects=True)
     assert response.status_code == 403
@@ -244,23 +227,15 @@ def test_create_major(test_client,init_database):
 
 def test_edit_major(test_client,init_database):
  #first login
-    do_login_faculty(test_client, '/user/login', 'john.doe@example.com', '123')
-
-    major = Major(name="test", department="Testing Department")
-    db.session.add(major)
-    db.session.commit()
-
-    
-    #test the create major form 
-    response = test_client.get('/faculty/majors/1/edit')
-    assert response.status_code == 200
-    assert b"Edit Major" in response.data 
+    login_faculty(test_client)
 
     #get current values
     response = test_client.get('/faculty/majors/1/edit', follow_redirects=True)
     assert response.status_code == 200
-    assert b"test" in response.data
-    assert b"Testing Department" in response.data
+    assert b"Edit Major" in response.data 
+    assert b"Computer Science" in response.data
+    assert b"CS Dept" in response.data
+
 
     #edit values
     response = test_client.post('/faculty/majors/1/edit', 
@@ -282,7 +257,7 @@ def test_edit_major(test_client,init_database):
     do_logout(test_client, path = '/user/logout')
 
     # student login
-    do_login_student(test_client, '/user/login', 'snow@wpi.edu', '123')
+    login_student(test_client)
     
     response = test_client.get('/faculty/majors/1/edit', follow_redirects=True)
     assert response.status_code == 403
@@ -294,17 +269,14 @@ def test_edit_major(test_client,init_database):
 
 def test_delete_major(test_client,init_database):
  #first login
-    do_login_faculty(test_client, '/user/login', 'john.doe@example.com', '123')
+    login_faculty(test_client)
 
-    major = Major(name="test", department="Testing Department")
-    db.session.add(major)
-    db.session.commit()
-
-    
+   
     #get the major  
     response = test_client.get('/faculty/majors')
     assert response.status_code == 200
-    assert b"test" in response.data 
+    assert b"Computer Science" in response.data
+    assert b"CS Dept" in response.data
 
     #delete the major
     response = test_client.post('/faculty/majors/1/delete', follow_redirects=True)
@@ -324,7 +296,7 @@ def test_delete_major(test_client,init_database):
     do_logout(test_client, path = '/user/logout')
 
     # student login
-    do_login_student(test_client, '/user/login', 'snow@wpi.edu', '123')
+    login_student(test_client)
     
     response = test_client.get('/faculty/majors/1/edit', follow_redirects=True)
     assert response.status_code == 403
@@ -335,7 +307,7 @@ def test_delete_major(test_client,init_database):
 def test_list_topics(test_client,init_database):
 
     # faculty login
-    do_login_faculty(test_client, '/user/login', 'john.doe@example.com', '123')
+    login_faculty(test_client)
 
     response = test_client.get('/faculty/topics', follow_redirects=True)
     assert response.status_code == 200
@@ -343,7 +315,7 @@ def test_list_topics(test_client,init_database):
     do_logout(test_client, path = '/user/logout')
 
     # student login
-    do_login_student(test_client, '/user/login', 'snow@wpi.edu', '123')
+    login_student(test_client)
 
     response = test_client.get('/faculty/topics', follow_redirects=True)
     assert response.status_code == 403

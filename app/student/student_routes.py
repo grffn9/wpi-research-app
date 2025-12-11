@@ -7,7 +7,7 @@ import sqlalchemy as sqla
 from app import db
 
 from app.student.student_forms import EditProfileForm, get_courses, get_grades, get_instructors, ApplicationForm, SortForm
-from app.models.models import StudentCourse, ResearchPosition, Application
+from app.models.models import StudentCourse, ResearchPosition, Application, Student
 
 from app.student import student_blueprint as bp_student
 
@@ -57,26 +57,27 @@ def edit_profile():
     form = EditProfileForm()
     
     if form.validate_on_submit():
-        current_user.firstname = form.firstname.data
-        current_user.lastname = form.lastname.data
-        current_user.username = form.username.data
-        current_user.email = form.email.data
-        current_user.wpi_id = form.wpi_id.data
-        current_user.gpa = form.gpa.data
+        student = db.session.get(Student, current_user.id)
+        student.firstname = form.firstname.data
+        student.lastname = form.lastname.data
+        student.username = form.username.data
+        student.email = form.email.data
+        student.wpi_id = form.wpi_id.data
+        student.gpa = form.gpa.data
         
-        current_user.majors_of_student = form.majors.data
-        current_user.research_topics = form.research_topics.data
-        current_user.programming_languages = form.programming_languages.data
+        student.majors_of_student = form.majors.data
+        student.research_topics = form.research_topics.data
+        student.programming_languages = form.programming_languages.data
         
         # Update coursework
-        current_user.coursework.clear()
+        student.coursework.clear()
         for entry in form.coursework.data:
             coursework_entry = StudentCourse(
                 course=entry['course'],
                 instructor=entry['instructor'],
                 grade=entry['grade'],
             )
-            current_user.coursework.append(coursework_entry)
+            student.coursework.append(coursework_entry)
         
         db.session.commit()
         flash('Your profile has been updated.')
@@ -152,7 +153,7 @@ def apply(position_id):
         
         if form.reference.data:
             application.reference_id = form.reference.data.id
-            application.reference_status = 'pending'
+            application.reference_status = 'Pending'
             
         db.session.add(application)
         db.session.commit()

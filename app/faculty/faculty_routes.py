@@ -6,7 +6,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 
 import sqlalchemy as sqla
 from datetime import datetime, timezone
-from app.faculty.faculty_forms import ResearchPositionForm,MajorForm, ResearchTopicForm, ProgrammingLanguageForm, CourseForm
+from app.faculty.faculty_forms import ResearchPositionForm,MajorForm, ResearchTopicForm, ProgrammingLanguageForm, CourseForm, RecommendationForm
 from app import db
 from app.faculty import faculty_blueprint as bp_faculty
 # from app.faculty.faculty_models import Major, ResearchTopic, ProgrammingLanguage, Course
@@ -184,7 +184,23 @@ def viewProfile():
         current_user.last_notif_time = datetime.now(timezone.utc)
         db.session.commit()
     refs = db.session.scalars(sqla.select(Application).where(Application.reference_id == current_user.id)).all()
-    return render_template('display_profile.html', title = "Display Profile", faculty = current_user, referals = refs)
+    form = RecommendationForm()
+    return render_template('display_profile.html', title = "Display Profile", faculty = current_user, referals = refs, form = form)
+
+@bp_faculty.route('/faculty/<int:rec_id>/recommend', methods=['GET', 'POST'])
+@login_required
+def change_rec_status(rec_id):
+    # if current_user.user_type == 'Faculty':
+    #     current_user.last_notif_time = datetime.now(timezone.utc)
+    #     db.session.commit()
+    refs = db.session.scalars(sqla.select(Application).where(Application.reference_id == current_user.id)).all()
+    form = RecommendationForm()
+    if form.validate_on_submit():
+        print(rec_id)
+        application = db.session.scalars(sqla.select(Application).where(Application.id == rec_id)).first()
+        application.reference_status = form.rec_status.data
+        db.session.commit()
+    return render_template('display_profile.html', title = "Display Profile", faculty = current_user, referals = refs, form = form)
 
 # ------------------ Applicants ------------------
 @bp_faculty.route('/position/<int:position_id>/applicants', methods=['GET', 'POST'])
@@ -204,7 +220,7 @@ def view_one_applicant(applicant_id):
     return render_template('view_one_applicant.html', student=student, application=application, faculty = current_user)
 
 
-#sandra
+
 @bp_faculty.route('/application/<int:app_id>/update', methods=['POST'])
 @login_required
 def update_application_status(app_id):
@@ -303,7 +319,6 @@ def list_topics():
         sqla.select(ResearchTopic).order_by(ResearchTopic.name)
     ).all()
     return render_template('topics_list.html', topics=topics, faculty = current_user)
-#sandra
 
 @bp_faculty.route('/faculty/topics/create', methods=['GET','POST'])
 @login_required
