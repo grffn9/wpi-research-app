@@ -22,11 +22,24 @@ class Config(object):
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
 
     # MAIL_PASSWORD = os.environ.get('PASSWORD')
-    #MAIL_PASSWORD = 'yais prjj hfip qhtg' 
+    #MAIL_PASSWORD = "lyne xpwd duym oefg" 
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 
     
     MAIL_USE_TLS = False
     MAIL_USE_SSL = True
 
+    AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN")
+    AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID")
+    AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")
+
+    AUTH0_REDIRECT_URI = os.environ.get("AUTH0_REDIRECT_URI")
+
+    FACULTY_EMAIL_DOMAIN = "@example.com"  
+
     
+class TestingConfig(Config):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    WTF_CSRF_ENABLED = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = False

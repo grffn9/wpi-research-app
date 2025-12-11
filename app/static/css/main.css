@@ -99,3 +99,9 @@ a:hover {
     color: #157dd3; 
     text-transform: uppercase;
 }
+
+.large{
+    transform: scale(1.5);
+    margin: 10px;
+
+}

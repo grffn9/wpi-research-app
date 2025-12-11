@@ -9,11 +9,7 @@
 <div class="container mt-4" style="max-width: 600px;">
 
     <h2 class="mb-4">
-        {% if editing %}
             Edit Position
-        {% else %}
-            Create Position (Faculty)
-        {% endif %}
     </h2>
 
     <form method="POST">
@@ -64,30 +60,30 @@
         <!-- Preferred Majors -->
         <div class="mb-3">
             <label class="form-label">Preferred Majors</label>
-            {{ form.preferred_majors(class="form-control rounded-3") }}
+            {{ form.preferred_majors }}
         </div>
 
         <!-- Research Topics -->
         <div class="mb-3">
             <label class="form-label">Research Topics</label>
-            {{ form.research_topics(class="form-control rounded-3") }}
+            {{ form.research_topics }}
         </div>
 
         <!-- Programming Languages -->
         <div class="mb-3">
             <label class="form-label">Programming Languages</label>
-            {{ form.programming_languages(class="form-control rounded-3") }}
+            {{ form.programming_languages }}
         </div>
 
         <!-- Required Courses -->
         <div class="mb-3">
             <label class="form-label">Required Courses</label>
-            {{ form.required_courses(class="form-control rounded-3") }}
+            {{ form.required_courses }}
         </div>
 
         <div class="text-start mb-5">
             <button type="submit" class="btn btn-secondary px-4 py-2 rounded-3">
-                {% if editing %}Save Changes{% else %}Post{% endif %}
+                Save Changes
             </button>
         </div>
 
