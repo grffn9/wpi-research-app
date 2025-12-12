@@ -1,0 +1,93 @@
+{% extends "faculty_base.html" %}
+{% block content %}
+
+<div class="wpi-header" style="border-bottom: 3px solid #b31e2d;">
+    <img src="{{ url_for('static', filename='img/wpi_logo.png') }}"
+         alt="WPI Logo" style="height: 70px; margin: 10px;">
+</div>
+
+<div class="container mt-4" style="max-width: 600px;">
+
+    <h2 class="mb-4">
+            Edit Position
+    </h2>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <!-- Title -->
+        <div class="mb-3">
+            <label class="form-label">Title</label>
+            {{ form.title(class="form-control form-control-lg rounded-3") }}
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            {{ form.description(class="form-control rounded-3", rows="4") }}
+        </div>
+
+        <!-- Start Date -->
+        <div class="mb-3">
+            <label class="form-label">Start Date</label>
+            {{ form.start_date(class="form-control rounded-3") }}
+        </div>
+
+        <!-- End Date -->
+        <div class="mb-3">
+            <label class="form-label">End Date</label>
+            {{ form.end_date(class="form-control rounded-3") }}
+        </div>
+
+        <!-- Team Size -->
+        <div class="mb-3">
+            <label class="form-label">Team Size</label>
+            {{ form.team_size(class="form-control rounded-3") }}
+        </div>
+
+        <!-- Minimum GPA -->
+        <div class="mb-3">
+            <label class="form-label">Minimum GPA</label>
+            {{ form.min_gpa(class="form-control rounded-3") }}
+        </div>
+
+        <!-- Reference Required -->
+        <div class="form-check mb-3">
+            {{ form.reference_required(class="form-check-input") }}
+            <label class="form-check-label">Reference Required?</label>
+        </div>
+
+        <!-- Preferred Majors -->
+        <div class="mb-3">
+            <label class="form-label">Preferred Majors</label>
+            {{ form.preferred_majors }}
+        </div>
+
+        <!-- Research Topics -->
+        <div class="mb-3">
+            <label class="form-label">Research Topics</label>
+            {{ form.research_topics }}
+        </div>
+
+        <!-- Programming Languages -->
+        <div class="mb-3">
+            <label class="form-label">Programming Languages</label>
+            {{ form.programming_languages }}
+        </div>
+
+        <!-- Required Courses -->
+        <div class="mb-3">
+            <label class="form-label">Required Courses</label>
+            {{ form.required_courses }}
+        </div>
+
+        <div class="text-start mb-5">
+            <button type="submit" class="btn btn-secondary px-4 py-2 rounded-3">
+                Save Changes
+            </button>
+        </div>
+
+    </form>
+</div>
+
+{% endblock %}

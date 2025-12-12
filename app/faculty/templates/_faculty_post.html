@@ -1,0 +1,100 @@
+<!-- We add an id for the table to update the HTML content of the table through JavaScript.  -->
+
+<div class="col" id="position-{{position.id}}">
+    <div class="card border-secondary"> 
+        <h4 class="card-header border-secondary" style="text-align: center; background-color: #dbe3ec;">{{position.title}}</h4>
+            <div id="post-body-{{position.id}}"class="card-body" hidden="true" style=" overflow: auto; overflow-wrap: break-word;">
+                <div class="container">
+                <p id="pdescription" class="card-text"><strong>Description:</strong> {{ position.description }}</p><br>
+                <table id="ptable1" class="table table-sm table-striped table-bordered" style="background-color: #dbe3ec;">
+                    <thead>
+                        <tr>
+                            <th scope="col">Start Date:</th>
+                            <th scope="col">End Date:</th>
+                            <th scope="col">Team Size:</th>
+                            <th scope="col">Min GPA:</th>
+                            <th scope="col">Reference Required:</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pbody1" class="table-group-divider">
+                        <tr>
+                            <td>{{ position.start_date }}</td>
+                            <td>{{ position.end_date }}</td>
+                            <td>{{ position.team_size }}</td>
+                            <td>{{ position.min_gpa }}</td>
+                            <td>
+                                {% if position.reference_required == False %}
+                                    No
+                                {% else %}
+                                    Yes
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+                <table id="ptable2" class="table table-sm table-striped table-bordered" style="background-color: #dbe3ec;">
+                    <thead>
+                        <tr>
+                            <th scope="col">Preferred Majors:</th>
+                            <th scope="col">Research Topics:</th>
+                            <th scope="col">Programming Languages:</th>
+                            <th scope="col">Expected Coursework:</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pbody2" class="table-group-divider">
+                        <tr>
+                            <td>
+                                <ul id="majors_list" class="list-group list-group-flush" >
+                                {% for major in position.preferred_majors %} 
+                                    <li class="list-group-item" style="background-color: inherit;"> {{major.name}} </li>
+                                {% endfor %}
+                                </ul>
+                            </td>
+                            <td> 
+                                <ul id="topics_list" class="list-group list-group-flush" >
+                                {% for topic in position.research_topics %} 
+                                    <li class="list-group-item" style="background-color: inherit;"> {{topic.name}} </li>
+                                {% endfor %}
+                                </ul>
+                            </td>
+                            <td> 
+                                <ul id="langs_list" class="list-group list-group-flush" >
+                                {% for lang in position.programming_languages %} 
+                                    <li class="list-group-item" style="background-color: inherit;"> {{lang.name}} </li>
+                                {% endfor %}
+                                </ul>
+                            </td>
+                            <td> 
+                                <ul id="courses_list" class="list-group list-group-flush" >
+                                {% for course in position.required_courses %} 
+                                    <li class="list-group-item" style="background-color: inherit;"> {{course.title}} </li>
+                                {% endfor %}
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-outline-primary" onclick="closeDetails({{position.id}})">Close</button>
+            </div></div>
+        <div id="post_buttons" class="card-footer border-secondary" style="text-align: center;">
+            <a class="btn btn-primary" href="{{ url_for('faculty.view_applicants', position_id=position.id) }}">See Applicants</a>
+            <a class="btn btn-primary" href="{{ url_for('faculty.edit_position', position_id=position.id) }}">Edit Position</a>
+            <button id="details" class="btn btn-primary" onclick="showDetails({{position.id}})">See Details</button>
+        </div>
+    </div>
+</div>
+
+{% block script %}
+<script>
+    function showDetails(position_id){
+        let parent_div = document.getElementById(`post-body-${position_id}`)
+        console.log(parent_div.id)
+        parent_div.hidden = false
+    }
+    function closeDetails(pos_id){
+        let parent_div = document.getElementById(`post-body-${pos_id}`)
+        parent_div.hidden = true
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,53 @@
+<div class="accordion-item">
+  <h2 class="accordion-header">
+    <button class="accordion-button collapsed" type="button" aria-expanded="false" aria-controls="flush-collapseOne" onclick="toggleAccordion({{rec.id}})" style="background-color: #dbe3ec;">
+      <span>Recommendation Request for: {{rec.student.get_firstname()}} {{rec.student.get_lastname()}} - <span style="color:blue">{{rec.student.get_email()}}</span>
+          for {{rec.position.title}} | 
+          {% if rec.reference_status == 'Pending' %}
+            <span class="badge text-bg-primary">Pending</span>
+          {% elif rec.reference_status == 'Confirmed' %}
+            <span class="badge text-bg-success">Confirmed</span>
+          {% elif rec.reference_status == 'Denied' %}
+            <span class="badge text-bg-danger">Denied</span>
+          {% else %}
+            <span class="badge text-bg-primary">{{rec.reference_status}}</span>
+          {% endif %}
+      </span>
+    </button>
+  </h2>
+  <div id="flush-collapse-{{rec.id}}" class="accordion-collapse" hidden="true">
+    <div class="accordion-body"><b>Change Recommendation Status</b><br>
+      {% if form %}
+        <form action="{{ url_for('faculty.change_rec_status', rec_id = rec.id) }}" method="POST">
+            {{ form.hidden_tag() }}
+          <div style="margin: 10px 0 10px 0; max-width: 200px;">
+            {{ form.rec_status(class="form-control rounded-1") }}
+          </div>
+          <div style="margin: 10px 0 10px 0; max-width: 150px;">
+            {{ form.submit(class="form-control text-bg-primary rounded-3") }}
+          </div>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% block script %}
+<script>
+  function toggleAccordion(rec_id){
+    console.log(rec_id)
+    let element = document.getElementById(`flush-collapse-${rec_id}`)
+    if (element.hidden == true){
+      console.log("Item was hidden")
+      element.hidden = false
+    }
+    else if (element.hidden == false){
+      console.log("Item was not hidden")
+      element.hidden = true
+    }
+    else{
+      console.log(element.hidden)
+    }
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "faculty_base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Courses</h2>
+
+    <a class="btn btn-primary mb-3" href="{{ url_for('faculty.create_course') }}">Add Course</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Course #</th>
+                <th>Title</th>
+                <th>Major</th>
+                <th style="width: 180px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in courses %}
+            <tr>
+                <td>{{ course.coursenum }}</td>
+                <td>{{ course.title }}</td>
+                <td>{{ course.major.name }}</td>
+
+                <td>
+                    <a class="btn btn-sm btn-secondary"
+                       href="{{ url_for('faculty.edit_course', course_id=course.id) }}">Edit</a>
+
+                    <form method="POST"
+                          action="{{ url_for('faculty.delete_course', course_id=course.id) }}"
+                          style="display: inline-block;"
+                          onsubmit="return confirm('Delete this course?');">
+                        <button class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}

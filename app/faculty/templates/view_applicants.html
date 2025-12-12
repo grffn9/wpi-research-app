@@ -1,0 +1,52 @@
+{% extends "faculty_base.html" %}
+
+{% block content %}
+    <h1>Applicants</h1>
+   
+
+
+    <table class = "table table-light table-hover table-bordered border-3 align-middle">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>View</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for  application in applications  %}
+        <tr>
+            <td>{{ application.student.firstname }} {{ application.student.lastname }}</td>
+            <td>{{ application.student.email }}</td>
+            <td>
+                {% if application.status == "Accepted" %}
+                    <span class="badge bg-success">Accepted</span><br>
+                {% elif application.status == "Rejected" %}
+                    <span class="badge bg-danger">Rejected</span><br>
+                {% else %}
+                    <span class="badge bg-secondary">Pending</span><br>
+                {% endif %}
+
+                {% set other_jobs = application.student.get_other_accepted_positions(position.id) %}
+                {% if other_jobs %}
+                    <br>
+                    <span class="badge bg-warning text-dark" title="Accepted for: {{ other_jobs|map(attribute='title')|join(', ') }}">
+                        ⚠ Hired Elsewhere
+                    </span>
+                {% endif %}
+            </td>
+            <td>
+                <form action="{{ url_for('faculty.view_one_applicantion', applicantion_id=application.id) }}" method="post" class="ms-3">
+                    <input type="submit" value="View" class="btn btn-primary">
+                </form>
+            </td>
+        </tr>
+        {%else%}
+        <tr>
+            <td colspan="4">No applicants found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

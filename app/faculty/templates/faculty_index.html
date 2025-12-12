@@ -1,17 +1,18 @@
-{% extends "base.html" %}
+{% extends "faculty_base.html" %}
 
 {% block content %}
 
-    <h1>Welcome to Smile Portal!</h1>
+    <h1>Hello Faculty.</h1>
     <!-- TODO: (milestone1) Display smile count.   -->
-    <h3>Number of smiles:  </h3>
+    <h3>Your positions: {{positions | length}} </h3><br>
 
     <!-- TODO: (milestone 2) Add the template to render an instance of a `sortForm`. The form should display the sort attribute select box and the "Refresh" submit button.
             Style the `sortorder` form element using the `formselect` CSS element we defined in milestone1 -->
 
     <!-- TODO: (milestone1) Format posts -->
-    {% for post in posts %}
-        {% include '_post.html' %} 
+    <div class="row row-cols-1 row-cols-md-2 g-4" style="margin-bottom: 15px;">
+    {% for position in positions %}
+       {% include '_faculty_post.html' %}
     {% endfor %}
-  
+    </div>
 {% endblock %}

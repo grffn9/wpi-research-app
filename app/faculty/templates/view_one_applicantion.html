@@ -1,0 +1,144 @@
+{% extends "faculty_base.html" %}
+
+{% block content %}
+<section>
+    <h1 style="text-transform: uppercase;">{{ student.firstname }} {{ student.lastname }}'s Application</h1>
+    <hr>
+
+    <p><strong>Email:</strong> {{ student.email }}</p>
+    <p><strong>WPI ID:</strong> {{ student.wpi_id }}</p>
+    <p><strong>GPA:</strong> {{ student.gpa }}</p>
+
+
+<table class = "table table-light table-hover table-bordered border-3 align-middle">
+    <thead>
+        <tr>
+            <th>Majors</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for major in student.get_majors() %}
+        <tr>
+            <td>{{ major.name }} ({{ major.department }})</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td>No majors listed.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+
+
+
+<table class = "table table-light table-hover table-bordered border-3 align-middle">
+    <thead>
+        <tr>
+            <th>Research Topics</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for topic in student.get_research_topics() %}
+        <tr>
+            <td>{{ topic.name }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td>No research topics listed.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+
+<table class = "table table-light table-hover table-bordered border-3 align-middle">
+    <thead>
+        <tr>
+            <th>Programming Languages</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for lang in student.get_programming_languages() %}
+        <tr>
+            <td>{{ lang.name }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td>No programming languages listed.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+   
+    <h3>Coursework</h3>
+    <table class = "table table-light table-hover table-bordered border-3 align-middle">
+        <thead>
+            <tr style="text-align: left;">
+                <th>Course Num</th>
+                <th>Title</th>
+                <th>Instructor</th>
+                <th>Grade</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course_record in student.get_coursework() %}
+            <tr>
+                <td>{{ course_record.course.coursenum }}</td>
+                <td>{{ course_record.course.title }}</td>
+                <td>{{ course_record.instructor.name }}</td>
+                <td>{{ course_record.grade.value }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4">No coursework listed.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+
+    <table class = "table table-light table-hover table-bordered border-3 align-middle">
+        <thead>
+            <tr>
+                <th>Statement of Interest</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>{{application.statement}}</td></tr>
+        </tbody>
+    </table>
+</section>
+
+<div class="mt-4">
+    {% set other_jobs = student.get_other_accepted_positions(application.position_id) %}
+    {% if other_jobs %}
+        <div class="alert alert-warning">
+            <strong>Warning:</strong> This student has already been accepted for the following position(s):
+            <ul>
+                {% for job in other_jobs %}
+                    <li>{{ job.title }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <form action="{{ url_for('faculty.update_application_status', app_id=application.id) }}" method="post"
+          onsubmit="return confirm('Are you sure you want to ACCEPT this application?');">
+        <input type="hidden" name="action" value="accept">
+        <button class="btn btn-success">Accept Application</button>
+    </form>
+
+    <form action="{{ url_for('faculty.update_application_status', app_id=application.id) }}" method="post"
+          onsubmit="return confirm('Are you sure you want to REJECT this application?');">
+        <input type="hidden" name="action" value="reject">
+        <button class="btn btn-danger">Reject Application</button>
+    </form>
+</div>
+{% endblock %}

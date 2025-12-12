@@ -1,0 +1,20 @@
+<h2>Edit {{ list_type }}</h2>
+
+<!-- Add new item -->
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.name.label }} {{ form.name }}
+    <button type="submit" name="add">Add</button>
+</form>
+
+<!-- Existing items with delete buttons -->
+<ul>
+    {% for item in items %}
+    <li>
+        {{ item.name }}
+        <form method="POST" style="display:inline;">
+            <button type="submit" name="delete" value="{{ item.id }}">Delete</button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>

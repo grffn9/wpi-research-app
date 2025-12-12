@@ -1,52 +1,112 @@
 <!-- We add an id for the table to update the HTML content of the table through JavaScript.  -->
-<table id="post-{{post.id}}" class = "posttable" style = "width:100%" valign="top">
-        <tr> 
-            <td colspan="3"><div class="posttitle"> {{post.title}} </div>
-            </td>
-        </tr>
-        <tr>
-            <td width="10%" >
-                <!--  (milestone1) TODO: include happiness-level image according to the `cost`s happiness_level .
-                For example :  <img src="{{ url_for('static', filename = 'img//happiness-level-1.png' )}}"  /> "-->   
-            </td>
-            <td width="80%" >
-                <!--  TODO: include post body in the following div element and style it. -->    
-                <div>  </div> <br> 
-                <!-- (milestone3) TODO: format the timestamp; display as local date/time-->
-                Posted at: {{ post.timestamp }} 
-            </td> 
-            <td width = "5%">
-                <div>
-                    <!-- (milestone1)  TODO: add "like" button
-                        Define an HTML `post` form with a submit button. The form action should redirect to `routes.like` route.
-                        Style the submit button using `likebtn` CCS class selector. -->
-                    <div>  </div>       
-                    <br>
-                    <!-- (milestone1) TODO: include the likes count in the following div element. -->
-                    <div>  </div>
-                </div> <br> 
-                 <!-- (milestone3) TODO: if the post is posted by the logged-in user, include the "delete" button.  
-                                   Define an HTML `post` form with a submit button. The form action should redirect to `routes.deletepost` route.
-                                   Style the submit button using `button` CCS class selector. -->
-            </td>
-        </tr>
-        <tr> 
-            <td colspan="3" style = "text-align:center" valign="bottom">  
-                <br>
-                <!-- (milestone2) TODO: include all the tags associated with the post-->
-            </td>
-        </tr>
-        <tr>
-            <td colspan="3" style = "text-align:center" valign="bottom">  
-                <br>
-                  <!-- (milestone3) TODO: include username who posted the post-->
-            </td>
-        </tr>
-    </table>
 
-<!-- (milestone3)  TODO: refactor the "like" use case. Add the JavaScript code below. -->
+<div class="col" id="position-{{position.id}}">
+    <div class="card border-secondary "> 
+        <h4 class="card-header border-secondary" style="text-align: center; background-color: #dbe3ec;">{{position.title}}</h4>
+            <div  class="card-body" style=" overflow: auto; overflow-wrap: break-word;">
+                <p id="pdescription" class="card-text"><strong>Description:</strong> {{ position.description }}</p>
+            </div>
+            <div id="post-body-{{position.id}}" class="card-body" hidden="true" >
+                <div class="container">
+                <table id="ptable1" class="table table-sm table-striped table-bordered" style="background-color: #dbe3ec;">
+                    <thead>
+                        <tr>
+                            <th scope="col">Start Date:</th>
+                            <th scope="col">End Date:</th>
+                            <th scope="col">Team Size:</th>
+                            <th scope="col">Min GPA:</th>
+                            <th scope="col">Reference Required:</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pbody1" class="table-group-divider">
+                        <tr>
+                            <td>{{ position.start_date }}</td>
+                            <td>{{ position.end_date }}</td>
+                            <td>{{ position.team_size }}</td>
+                            <td>{{ position.min_gpa }}</td>
+                            <td>
+                                {% if position.reference_required == False %}
+                                    No
+                                {% else %}
+                                    Yes
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+                <table id="ptable2" class="table table-sm table-striped table-bordered" style="background-color: #dbe3ec;">
+                    <thead>
+                        <tr>
+                            <th scope="col">Preferred Majors:</th>
+                            <th scope="col">Research Topics:</th>
+                            <th scope="col">Programming Languages:</th>
+                            <th scope="col">Expected Coursework:</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pbody2" class="table-group-divider">
+                        <tr>
+                            <td>
+                                <ul id="majors_list" class="list-group list-group-flush" >
+                                {% for major in position.preferred_majors %} 
+                                    <li class="list-group-item" style="background-color: inherit;"> {{major.name}} </li>
+                                {% endfor %}
+                                </ul>
+                            </td>
+                            <td> 
+                                <ul id="topics_list" class="list-group list-group-flush" >
+                                {% for topic in position.research_topics %} 
+                                    <li class="list-group-item" style="background-color: inherit;"> {{topic.name}} </li>
+                                {% endfor %}
+                                </ul>
+                            </td>
+                            <td> 
+                                <ul id="langs_list" class="list-group list-group-flush" >
+                                {% for lang in position.programming_languages %} 
+                                    <li class="list-group-item" style="background-color: inherit;"> {{lang.name}} </li>
+                                {% endfor %}
+                                </ul>
+                            </td>
+                            <td> 
+                                <ul id="courses_list" class="list-group list-group-flush" >
+                                {% for course in position.required_courses %} 
+                                    <li class="list-group-item" style="background-color: inherit;"> {{course.title}} </li>
+                                {% endfor %}
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="card-body border-secondary" style="text-align: center;">
+                <h6><strong>Posted By:</strong> {{ position.faculty.get_firstname() }} {{ position.faculty.get_lastname() }} 
+                    <span style="color: #157dd3">{{ position.faculty.get_email()}}</span></h6>
+                <button class="btn btn-outline-primary" onclick="closeDetails({{position.id}})">Show Less</button>
+            </div>
+            </div></div>
+            
+        <div class="card-footer border-secondary" style="text-align: center;">
+            <button id="details" class="btn btn-primary" onclick="showDetails({{position.id}})">See Details</button>
+            {% if position.id in applied_ids %}
+            <button class="btn btn-secondary" disabled>Applied</button>
+            {% else %}
+            <a class="btn btn-primary" href="{{ url_for('student.apply', position_id=position.id) }}">Apply</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
 {% block script %}
 <script>
-
-</script>    
+    
+    function showDetails(position_id){
+        let parent_div = document.getElementById(`post-body-${position_id}`)
+        console.log(parent_div.id)
+        parent_div.hidden = false
+    }
+    function closeDetails(pos_id){
+        let parent_div = document.getElementById(`post-body-${pos_id}`)
+        parent_div.hidden = true
+    }
+</script>
 {% endblock %}

@@ -1,0 +1,19 @@
+{% extends "faculty_base.html" %}
+
+{% block content %}
+    <h1>Faculty Profile</h1>
+    <div class="border rounded-3 bg-light p-3" style="max-width:99%;">
+        <h2>Personal Information</h2>
+        <p> <b>Name:</b> {% if faculty.get_firstname() %} {{faculty.get_firstname()}} {% endif %}
+                        {% if faculty.get_lastname() %}{{faculty.get_lastname()}} {% endif %}</p>
+        <p> <b>Username:</b> {% if faculty.get_username() %}{{faculty.get_username()}}{% endif %} </p>
+        <p> <b>Email:</b> {% if faculty.get_email() %}{{faculty.get_email()}} {% endif %}</p>
+        <hr>
+        <h2>Recommendations</h2>
+        <div class="accordion accordion-flush" id="accordionFlushExample">
+            {% for rec in referals%}
+                {% include '_recommendation.html'%}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

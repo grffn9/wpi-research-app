@@ -1,0 +1,150 @@
+{% extends "student_base.html" %}
+
+{% block content %}
+<section>
+    <h1>Student Profile</h1>
+    <div class="border rounded-3 bg-light p-3" style="max-width:99%;">
+    <h3>{{ current_user.firstname }} {{ current_user.lastname }}</h3>   
+    <hr>
+
+    <p><strong>Username:</strong> {{ current_user.username }}</p>
+    <p><strong>Email:</strong> {{ current_user.email }}</p>
+    <p><strong>WPI ID:</strong> {{ current_user.wpi_id }}</p>
+    <p><strong>GPA:</strong> {{ current_user.gpa }}</p>
+
+    <table class = "table table-light table-hover table-bordered border-3 align-middle">
+    <thead class="table-secondary">
+        <tr>
+            <th>Majors</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for major in current_user.get_majors() %}
+        <tr>
+            <td>{{ major.name }} ({{ major.department }})</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td>No majors listed.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+
+   <table class = "table table-light table-hover table-bordered border-3 align-middle">
+    <thead class="table-secondary">
+        <tr>
+            <th>Research Topics</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for topic in current_user.get_research_topics() %}
+        <tr>
+            <td>{{ topic.name }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td>No research topics listed.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+
+    <table class = "table table-light table-hover table-bordered border-3 align-middle">
+    <thead class="table-secondary">
+        <tr>
+            <th>Programming Languages</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for lang in current_user.get_programming_languages() %}
+        <tr>
+            <td>{{ lang.name }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td>No programming languages listed.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+
+    <h3>Coursework</h3>
+        <table class = "table table-light table-hover table-bordered border-3 align-middle">
+            <thead class="table-secondary">
+                <tr style="text-align: left;">
+                    <th>Course Num</th>
+                    <th>Title</th>
+                    <th>Instructor</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course_record in current_user.get_coursework() %}
+                <tr>
+                    <td>{{ course_record.course.coursenum }}</td>
+                    <td>{{ course_record.course.title }}</td>
+                    <td>{{ course_record.instructor.name }}</td>
+                    <td>{{ course_record.grade.value }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4">No coursework listed.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+
+    <h3>My Applications</h3>
+    <table class = "table table-light table-hover table-bordered border-3 align-middle">
+        <thead class="table-secondary">
+            <tr style="text-align: left;">
+                <th>Position</th>
+                <th>Date Applied</th>
+                <th>Status</th>
+                <th>Reference Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for app in applications %}
+            <tr>
+                <td>{{ app.position.title }}</td>
+                <td>{{ app.submit_time.strftime('%Y-%m-%d') if app.submit_time else 'N/A' }}</td>
+                <td>{{ app.status|capitalize }}</td>
+                <td>
+                    {% if app.reference_id %}
+                        {% if app.reference_status == 'Pending' %}
+                            Awaiting approval
+                        {% elif app.reference_status == 'Confirmed' %}
+                            Recommended
+                        {% elif app.reference_status == 'Denied' %}
+                            Not Recommended
+                        {% else %}
+                            {{ app.reference_status }}
+                        {% endif %}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>
+                    {% if app.status == 'pending' %}
+                    <form action="{{ url_for('student.withdraw_application', app_id=app.id) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Withdraw</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5">No applications submitted.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <a href="{{ url_for('student.edit_profile') }}"><button type="button" class="btn btn-primary">Edit Profile</button></a>
+    </div>
+</section>
+{% endblock %}

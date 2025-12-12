@@ -1,0 +1,126 @@
+{% extends "student_base.html" %}
+{% import 'bootstrap_wtf.html' as wtf %}
+
+{% block content %}
+<section>
+    <h1>Student Registration</h1>
+    <div class="border rounded-3 bg-light p-3" style="max-width:99%;">
+    <form action="{{ url_for('auth.register_student') }}" method="POST" novalidate>
+        {{ form.hidden_tag() }}
+
+        <h3>Account</h3>
+        {{ wtf.form_field(form.username) }}
+        {{ wtf.form_field(form.password) }}
+        {{ wtf.form_field(form.password2) }}
+
+        <h3>Contact</h3>
+        {{ wtf.form_field(form.firstname) }}
+        {{ wtf.form_field(form.lastname) }}
+        {{ wtf.form_field(form.email) }}
+        {{ wtf.form_field(form.wpi_id) }}
+
+        <h3>Profile</h3>
+        {{ wtf.form_field(form.gpa) }}
+        {{ wtf.form_field(form.majors) }}
+        {{ wtf.form_field(form.research_topics) }}
+        {{ wtf.form_field(form.programming_languages) }}
+
+        <h3>Advanced Coursework</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Advanced Course</th>
+                    <th>Grade Earned</th>
+                    <th>Instructor</th>
+                </tr>
+            </thead>
+            <tbody id="coursework-container">
+                {% for subform in form.coursework %}
+                <tr>
+                    <td>
+                        {{ subform.course(class="form-select") }}
+                        {% for error in subform.course.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {{ subform.grade(class="form-select") }}
+                        {% for error in subform.grade.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {{ subform.instructor(class="form-select") }}
+                        {% for error in subform.instructor.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="button" id="add-course-btn" class="btn btn-secondary mb-3">Add New Course</button>
+        {% for error in form.coursework.errors %}
+        <p class="text-danger">{{ error }}</p>
+        {% endfor %}
+
+        <br>{{ wtf.form_field(form.submit) }}
+    </form>
+    </div>
+    <p class="mt-3">Already have an account? <a href="{{ url_for('auth.login') }}">Sign in here.</a></p>
+</section>
+
+<script>
+    document.getElementById('add-course-btn').addEventListener('click', function() {
+        var container = document.getElementById('coursework-container');
+        var index = container.children.length;
+        
+        var row = document.createElement('tr');
+        
+        var courseCell = document.createElement('td');
+        var courseSelect = document.createElement('select');
+        courseSelect.name = 'coursework-' + index + '-course';
+        courseSelect.id = 'coursework-' + index + '-course';
+        courseSelect.className = 'form-select';
+        {% for id, label in course_choices %}
+        var option = document.createElement('option');
+        option.value = "{{ id }}";
+        option.text = "{{ label }}";
+        courseSelect.appendChild(option);
+        {% endfor %}
+        courseCell.appendChild(courseSelect);
+        row.appendChild(courseCell);
+
+        var gradeCell = document.createElement('td');
+        var gradeSelect = document.createElement('select');
+        gradeSelect.name = 'coursework-' + index + '-grade';
+        gradeSelect.id = 'coursework-' + index + '-grade';
+        gradeSelect.className = 'form-select';
+        {% for id, label in grade_choices %}
+        var option = document.createElement('option');
+        option.value = "{{ id }}";
+        option.text = "{{ label }}";
+        gradeSelect.appendChild(option);
+        {% endfor %}
+        gradeCell.appendChild(gradeSelect);
+        row.appendChild(gradeCell);
+
+        var instructorCell = document.createElement('td');
+        var instructorSelect = document.createElement('select');
+        instructorSelect.name = 'coursework-' + index + '-instructor';
+        instructorSelect.id = 'coursework-' + index + '-instructor';
+        instructorSelect.className = 'form-select';
+        {% for id, label in instructor_choices %}
+        var option = document.createElement('option');
+        option.value = "{{ id }}";
+        option.text = "{{ label }}";
+        instructorSelect.appendChild(option);
+        {% endfor %}
+        instructorCell.appendChild(instructorSelect);
+        row.appendChild(instructorCell);
+
+        container.appendChild(row);
+    });
+</script>
+{% endblock %}
+

@@ -25,7 +25,7 @@ Prepared by:
 | Name | Date | Changes | Version |
 | ------ | ------ | --------- | --------- |
 |Revision 1 |2025-11-14 |Initial draft | 1.0 |
-|           |           |              |     |
+|Revision 2 |25-12-1    |Final draft   | 2.0 |
 
 
 # 1. Introduction
@@ -54,7 +54,7 @@ associations and relationships among tables.
 
 Database UML diagram :
 <kbd>
-      <img src="images/dbUML.png"  border="2">
+      <img src="images/dbUMLFinal.png"  border="2">
 </kbd>
 
 
@@ -96,8 +96,11 @@ all routes for that sub-section in a table.
 #### 2.2.2.1 \<Auth> Routes
 | | Methods | URL Path | Description |
 |:--|:------------------|:-----------|:-------------|
-|1.|GET,POST|/student/register|resgisters a new student user|
-|2.|GET,POST|/faculty/activation|activates a premade faculty account |
+|1.|GET,POST|/register-student|resgisters a new student user|
+|2.|GET,POST|/register-faculty/<faculty_id>|activates a premade faculty account |
+|3.|GET,POST|/confirm-email/<faculty_id>|sends confirmation email for faculty users|
+|4.|/verify/<token>|verifies user after confirming email
+|5.|GET|/user/select-faculty|allows user to choose from a predefined list of faculty
 |3.|GET,POST|/user/login|logs a user in (student or faculty)|
 |4.|GET,POST|/user/logout |logs a user out of the system(student and faculty)|
 
@@ -105,24 +108,43 @@ all routes for that sub-section in a table.
 | | Methods | URL Path | Description |
 |:--|:------------------|:-----------|:-------------|
 |1. |GET |/student/index |homepage for student user |
-|2. |GET |/student/position/<position_id>/details |view the details of a position |
-|3. |POST |/student/position/<position_id>/apply | apply for a position |
-|4. |GET |/student/position/<position_id>/<application_id>/view |view an application status |
-|5. |GET |/student/profile/view |view your student profile |
-|6. |GET,POST |/student/editprofile |edit your student profile |
+|2. |GET |/position/view/<int:position_id> |view the details of a position |
+|3. |POST |/apply/<int:position_id> | apply for a position |
+|4. |GET |/<position_id>/<application_id>/view |view an application status |
+|5. |GET |/student/profile |view your student profile |
+|6. |GET,POST |/edit_profile |edit your student profile |
 
 #### 2.2.2.3 \<Main/faculty> Routes
 | | Methods | URL Path | Description |
 |:--|:------------------|:-----------|:-------------|
 |1. |GET |/faculty/index |faculty user home page |
-|2. |GET,POST |/faculty/position/create |create a new position |
+|2. |GET,POST |/create_position |create a new position |
 |3. |GET |/faculty/profile |view profile |
-|4. |GET |/faculty/position/<position_id>/application/view_all |view all aplications for a position |
-|5. |POST |/faculty/position/position<id>/application/<application_id>/approve |approve a specific application |
-|6. |POST |faculty/ position/position<id>/application/<application_id>/reject |reject a specific application |
-|7. |POST | /faculty/recommendation/<recommendation_id>/approve |approve a reccomendation for an application |
-|8. |POST |/faculty/recommendation/<recommendation_id>/deny|deny a recommendation for an application |
-|9. |GET,POST |/faculty/position/edit_options |edit a posted position |
+|4. |GET |/position/<int:position_id>/applicants |view all aplications for a position |
+|5. |POST |/application/<int:app_id>/update |updates the status of a specific application to either approved or rejected |
+|6. |POST | /faculty/recommendation/<recommendation_id>/approve |approve a reccomendation for an application |
+|7. |POST |/faculty/recommendation/<recommendation_id>/deny|deny a recommendation for an application |
+|8. |GET,POST |/position/<int:position_id>/edit |edit a posted position |
+|9.|GET,POST |/position/<int:applicant_id>/ | view a speciffic application for a position |
+|10. |/faculty/majors|shows a list of predefined majors |
+|11. |GET,POST |/faculty/majors/create |create a new major in the lsit |
+|12.|GET,POST |/faculty/majors/<int:major_id>/edit | edit a major in the list |
+|13.|POST |/faculty/majors/<int:major_id>/delete | delets a major from the list |
+|14. |/faculty/topics|shows a list of predefined research topics |
+|15. |GET,POST |/faculty/topics/create |create a new topic in the lsit |
+|16.|GET,POST |/faculty/topics/<int:topic_id>/edit | edit a topic in the list |
+|17.|POST |/faculty/topics/<int:topic_id>/delete | delets a topic from the list |
+|18. |/faculty/courses|shows a list of predefined courses |
+|19. |GET,POST |/faculty/courses/create |create a new course in the lsit |
+|20.|GET,POST |/faculty/courses/<int:course_id>/edit | edit a course in the list |
+|21.|POST |/faculty/majors/<int:course_id>/delete | delets a course from the list |
+|22. |/faculty/languages|shows a list of predefined programming languages |
+|23. |GET,POST |/faculty/languages/create |create a new language in the lsit |
+|24.|GET,POST |/faculty/languages/<int:language_id>/edit | edit a language in the list |
+|25.|POST |/faculty/languages/<int:language_id>/delete | delets a language from the list |
+
+
+
 
 Repeat the above for other modules you included in your
 application.
@@ -137,12 +159,12 @@ Provide UI sketches or screenshots for the following pages:
 * Student applying a position
 
 <kbd>
-      <img src="images/faculty_main.png"  border="2">
-      <img src="images/student_main.png"  border="2">
-      <img src="images/faculty_create.png" border="2">
-      <img src="images/faculty_create.png"  border="2">
-      <img src="images/faculty_app_result.png"  border="2">
-      <img src="images/student_apply.png"  border="2">
+      <img src="images/faculty_main_updated.png"  border="2">
+      <img src="images/student_main_updated.png"  border="2">
+      <img src="images/faculty_create_pos_updated.png" border="2">
+      <img src="images/faculty_applicants_updated.png"  border="2">
+      <img src="images/faculty_specific_applicant_updated.png"  border="2">
+      <img src="images/student_application_updated.png"  border="2">
 </kbd>
 
 # 3. References
