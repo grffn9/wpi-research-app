@@ -460,7 +460,7 @@ def create_course():
         abort(403)
     form = CourseForm()
     if form.validate_on_submit():
-        course = Course(coursenum=form.coursenum.data, title=form.title.data, major=form.major.data)
+        course = Course(coursenum=form.coursenum.data, title=form.title.data, major=form.majorid.data)
         db.session.add(course)
         db.session.commit()
         flash('Course created.', 'success')
@@ -477,7 +477,7 @@ def edit_course(course_id):
     if form.validate_on_submit():
         course.coursenum = form.coursenum.data
         course.title = form.title.data
-        course.major = form.major.data
+        course.major = form.majorid.data
         db.session.commit()
         flash('Course updated.', 'success')
         return redirect(url_for('faculty.list_courses'))
