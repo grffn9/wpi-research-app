@@ -269,8 +269,9 @@ def view_applicants(position_id):
     if not current_user.user_type == 'Faculty':
         abort(403)
 
+    position = db.session.get(ResearchPosition, position_id)
     all_applications = db.session.scalars(sqla.select(Application).where(Application.position_id == position_id)).all()
-    return render_template('view_applicants.html', applications=all_applications, faculty = current_user)
+    return render_template('view_applicants.html', applications=all_applications, faculty = current_user, position=position)
 
 
 @bp_faculty.route('/position/<int:applicantion_id>/', methods=['GET', 'POST'])

@@ -378,6 +378,17 @@ class Student(User):
             scores.append((pos, overlap))
         return sorted(scores, key=lambda x: (-x[1], x[0].start_date))
 
+    def get_other_accepted_positions(self, current_position_id):
+        """
+        Returns a list of ResearchPosition objects where the student is accepted,
+        excluding the current position_id.
+        """
+        accepted_positions = []
+        for app in self.applications:
+            if app.status == "Accepted" and app.position_id != current_position_id:
+                accepted_positions.append(app.position)
+        return accepted_positions
+
 
 ######################################################
 #Application

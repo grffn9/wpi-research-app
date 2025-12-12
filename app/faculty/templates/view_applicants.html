@@ -27,6 +27,14 @@
                 {% else %}
                     <span class="badge bg-secondary">Pending</span>
                 {% endif %}
+
+                {% set other_jobs = application.student.get_other_accepted_positions(position.id) %}
+                {% if other_jobs %}
+                    <br>
+                    <span class="badge bg-warning text-dark" title="Accepted for: {{ other_jobs|map(attribute='title')|join(', ') }}">
+                        ⚠ Hired Elsewhere
+                    </span>
+                {% endif %}
             </td>
             <td>
                 <form action="{{ url_for('faculty.view_one_applicantion', applicantion_id=application.id) }}" method="post" class="ms-3">
