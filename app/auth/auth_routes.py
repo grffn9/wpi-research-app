@@ -260,18 +260,10 @@ def sso_callback():
             else url_for("student.index")
         )
 
-    # Auto-create
-    faculty_domain = current_app.config.get("FACULTY_EMAIL_DOMAIN", "@wpi.edu")
+    # User not found: redirect to login
+    flash("Your SSO account exists but you are not registered in the system. Please log in manually.", "warning")
+    return redirect(url_for("auth.login"))
 
-    if email.endswith(faculty_domain):
-        new_user = Faculty(email=email, firstname=first, lastname=last, is_verified=True)
-    else:
-        from app.models.models import Student
-        new_user = Student(email=email, firstname=first, lastname=last)
-
-    db.session.add(new_user)
-    db.session.commit()
-    login_user(new_user)
 
     return redirect(
         url_for("faculty.index") if new_user.user_type == "Faculty"

@@ -40,6 +40,17 @@ def create_position():
             if form.end_date.data < form.start_date.data:
                 flash("End date cannot be earlier than the start date.", "danger")
                 return render_template("create_research_project.html", form=form, faculty=current_user)
+            
+    if form.team_size.data is not None and form.team_size.data < 1:
+        flash("Team size must be at least 1.", "danger")
+        return render_template("create_research_project.html", form=form, faculty=current_user)
+    
+    if form.min_gpa.data is not None:
+        if form.min_gpa.data < 0 or form.min_gpa.data > 4.0:
+            flash("Minimum GPA must be between 0.0 and 4.0.", "danger")
+            return render_template("create_research_project.html", form=form, faculty=current_user)
+
+
     
     if form.validate_on_submit():
         
@@ -151,6 +162,15 @@ def edit_position(position_id):
             if form.end_date.data < form.start_date.data:
                 flash("End date cannot be earlier than the start date.", "danger")
                 return render_template("edit_position.html", form=form, position=position, faculty=current_user)
+    
+    if form.team_size.data is not None and form.team_size.data < 1:
+        flash("Team size must be at least 1.", "danger")
+        return render_template("edit_position.html", form=form, position=position, faculty=current_user)
+    
+    if form.min_gpa.data is not None:
+        if form.min_gpa.data < 0 or form.min_gpa.data > 4.0:
+            flash("Minimum GPA must be between 0.0 and 4.0.", "danger")
+            return render_template("edit_position.html", form=form, position=position, faculty=current_user)
 
     if form.validate_on_submit():
 
