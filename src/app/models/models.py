@@ -374,7 +374,8 @@ class Student(User):
             overlap += len(set(self.majors_of_student) & set(pos.preferred_majors))
             overlap += len(set(self.programming_languages) & set(pos.programming_languages))
             overlap += len(set(self.research_topics) & set(pos.research_topics))
-            overlap += len(set(self.coursework) & set(pos.required_courses))
+            student_courses = {entry.course for entry in self.coursework if entry.course is not None}
+            overlap += len(student_courses & set(pos.required_courses))
             scores.append((pos, overlap))
         return sorted(scores, key=lambda x: (-x[1], x[0].start_date))
 

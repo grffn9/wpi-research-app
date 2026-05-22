@@ -143,10 +143,9 @@ def add_courses(*args, **kwargs):
         db.session.commit()
 
 
-@app.before_request
+@app.before_first_request
 def initDB(*args, **kwargs):
-    if app._got_first_request:
-        db.create_all()
+    db.create_all()
 
 if __name__ == "__main__":
     app.run(debug=True)

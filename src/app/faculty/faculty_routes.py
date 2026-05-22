@@ -79,7 +79,7 @@ def create_position():
         # --- Many-to-Many Selections ---
         # Majors
         if form.preferred_majors.data:
-            major_ids = [m.id for m in form.preferred_majors.data]
+            major_ids = [m.id if hasattr(m, "id") else int(m) for m in form.preferred_majors.data]
             selected_majors = Major.query.filter(Major.id.in_(major_ids)).all()
             position.preferred_majors.extend(selected_majors)
 

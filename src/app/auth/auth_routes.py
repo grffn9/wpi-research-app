@@ -25,6 +25,8 @@ def register_faculty(faculty_id):
     rform = FacultyRegistrationForm()
 
     faculty = db.session.get(Faculty, faculty_id)    
+    if faculty is None:
+        return render_template('errors/404error.html'), 404
 
     if rform.validate_on_submit():
         faculty.username = rform.username.data
@@ -49,7 +51,7 @@ def confirm_email(faculty_id):
 
     msg = Message(
         subject="Verify Your Email",
-        recipients=['researchteampy@gmail.com'],
+        recipients=[faculty.email],
         html=html,
         sender=current_app.config['MAIL_USERNAME']
     )
@@ -164,15 +166,13 @@ def login():
             query_faculty =  sqla.select(Faculty).where(Faculty.email == user.email)
             faculty = db.session.scalars(query_faculty).first()
 
-            if not faculty.is_verified:
+            if not faculty or not faculty.is_verified:
                 flash('Faculty account is not verified.')
                 return redirect(url_for('auth.login'))
 
-            if( not faculty.password_hash) or not (user.check_password(lform.password.data)):
-                #redirect back to login
-                #Invalid username or password
-                flash('Invalid email or password')
-                return redirect(url_for('auth.login'))
+        if not user.check_password(lform.password.data):
+            flash('Invalid email or password')
+            return redirect(url_for('auth.login'))
        
         #login user and redirect to index page
         login_user(user, remember = lform.remember_me.data)
